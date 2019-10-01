@@ -3,4 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="topbar_color">#01611b</color>
+    <color name="microphone_background">#07a832</color>
+    <color name="contact_color">#01611b</color>
 </resources>
