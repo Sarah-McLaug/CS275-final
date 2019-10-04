@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ConversationAnalysis</string>
+    <string name="contact">Contact Us</string>
+    <string name="record_toast">Begin recording.</string> <!-- This is a temporary string until we implement recording. -->
+    <string name="contact_email">Donna and Bob\nplaceholder@domain.edu</string>
 </resources>
