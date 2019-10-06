@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Used to round the corners of the Record Button -->
+<!-- Code received from: https://stackoverflow.com/questions/21633637/rounded-corners-android-image-buttons -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#66AC47" />
+    <corners android:radius="16dp" />
+</shape>

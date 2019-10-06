@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/topbar_color</item>
     </style>
 
+    <!-- This appends to the AppTheme style.
+         I took away the Action Bar (I don't think we had one in the first place) so the nav menu could slide over it.
+         We can make our own Action Bar to show when the nav menu is not out, if we want to. Google: Android Toolbar.
+         I also make the status bar transparent, so it doesn't mess with the user's view of the nav view. -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 </resources>
