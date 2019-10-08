@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav -->
+    tools:openDrawer=""> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav -->
 
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,15 +31,14 @@
                 android:id="@+id/logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="68dp"
                 android:text="LOGO"
                 android:textColor="@android:color/white"
                 android:textSize="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.484" />
+                app:layout_constraintVertical_bias="1.0" />
 
             <Button
                 android:id="@+id/menu_button"
@@ -47,10 +46,11 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/menu_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.906"
-                app:layout_constraintStart_toEndOf="@+id/logo"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toStartOf="@+id/logo"
+                app:layout_constraintHorizontal_bias="0.154"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.625" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageButton
