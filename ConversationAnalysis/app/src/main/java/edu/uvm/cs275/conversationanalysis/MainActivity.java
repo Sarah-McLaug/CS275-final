@@ -5,7 +5,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
@@ -17,7 +16,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import java.io.IOException;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mMenuButton;
     private TextView mContactInfo;
     private MediaRecorder mRecorder;
+    private ConversationManager mConversationManager;
 
     private boolean recordPermission = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
@@ -39,14 +42,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = (DrawerLayout) findViewById(R.id.drawer_layout); // grab the navigation drawer
-
         buttonPress();
     }
 
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
-    *  button to close the menu, not the entire activity. */
+     *  button to close the menu, not the entire activity. */
     @Override
     public void onBackPressed(){
         if(mNavDrawer.isDrawerOpen(GravityCompat.START)){
@@ -88,29 +91,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // This method contains the calls for when a button is pressed.
-    private void buttonPress(){
+    private void buttonPress() {
         // Pressing the record button.
         mRecordButton = (ImageButton) findViewById(R.id.record_button);
         /* This toast is a placeholder until we implement the recording function. */
-        mRecordButton.setOnClickListener(new View.OnClickListener(){
+        mRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                Toast.makeText(MainActivity.this, R.string.record_toast,Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, R.string.record_toast, Toast.LENGTH_SHORT).show();
             }
         });
 
         // Pressing "Contact Us"
         mContactInfo = (TextView) findViewById(R.id.contact);
-        mContactInfo.setOnClickListener(new View.OnClickListener(){
+        mContactInfo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 mContactInfo.setText(R.string.contact_email);
             }
         });
 
         // Pressing the menu button
         mMenuButton = (Button) findViewById(R.id.menu_button);
-        mMenuButton.setOnClickListener(new View.OnClickListener(){
+        mMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 if(!mNavDrawer.isDrawerOpen(Gravity.LEFT)){
