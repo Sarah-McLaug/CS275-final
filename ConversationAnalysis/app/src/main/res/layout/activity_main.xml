@@ -31,15 +31,14 @@
                 android:id="@+id/logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="92dp"
                 android:text="LOGO"
                 android:textColor="@android:color/white"
                 android:textSize="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.484" />
+                app:layout_constraintVertical_bias="0.0" />
 
             <Button
                 android:id="@+id/menu_button"
@@ -47,10 +46,11 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/menu_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.906"
-                app:layout_constraintStart_toEndOf="@+id/logo"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toStartOf="@+id/logo"
+                app:layout_constraintHorizontal_bias="0.154"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.625" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageButton
@@ -90,7 +90,7 @@
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
+        android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:menu="@menu/nav_menu" />
 

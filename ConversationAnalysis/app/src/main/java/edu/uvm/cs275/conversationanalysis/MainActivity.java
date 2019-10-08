@@ -1,5 +1,9 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -32,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
      *  button to close the menu, not the entire activity. */
     @Override
-    public void onBackPressed() {
-        if (mNavDrawer.isDrawerOpen(GravityCompat.END)) {
-            mNavDrawer.closeDrawer(GravityCompat.END);
+    public void onBackPressed(){
+        if(mNavDrawer.isDrawerOpen(GravityCompat.START)){
+            mNavDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -65,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
         mMenuButton = (Button) findViewById(R.id.menu_button);
         mMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (!mNavDrawer.isDrawerOpen(Gravity.RIGHT)) {
-                    mNavDrawer.openDrawer(Gravity.RIGHT);
+            public void onClick(View v){
+                if(!mNavDrawer.isDrawerOpen(Gravity.LEFT)){
+                    mNavDrawer.openDrawer(Gravity.LEFT);
                 } else {
-                    mNavDrawer.closeDrawer(Gravity.LEFT);
+                    mNavDrawer.closeDrawer(Gravity.RIGHT);
                 }
             }
         });
