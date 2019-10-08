@@ -7,10 +7,12 @@ public class Conversation {
 
     private UUID mUUID;
     private Date mDate;
+    private boolean mUploaded;
 
-    public Conversation(UUID uuid, Date date) {
+    public Conversation(UUID uuid, Date date, boolean uploaded) {
         this.mUUID = uuid;
         this.mDate = date;
+        this.mUploaded = false;
     }
 
     public UUID getUUID() {
@@ -27,5 +29,13 @@ public class Conversation {
 
     public void setDate(Date date) {
         mDate = date;
+    }
+
+    public boolean isUploaded() {
+        return mUploaded;
+    }
+
+    public void setUploaded(boolean uploaded) {
+        mUploaded = uploaded;
     }
 }

@@ -19,13 +19,14 @@ public class ConversationBaseHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + ConversationTable.NAME + "(" +
                 " _id integer primary key autoincrement, " +
                 ConversationTable.Cols.UUID + ", " +
-                ConversationTable.Cols.DATE +
+                ConversationTable.Cols.DATE + ", " +
+                ConversationTable.Cols.UPLOADED +
                 ")"
         );
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 }

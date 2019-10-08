@@ -14,11 +14,12 @@ public class ConversationCursorWrapper extends CursorWrapper {
         super(cursor);
     }
 
-    public Conversation getConversation(){
+    public Conversation getConversation() {
         String uuidString = getString(getColumnIndex(ConversationSchema.ConversationTable.Cols.UUID));
         long date = getLong(getColumnIndex(ConversationSchema.ConversationTable.Cols.DATE));
+        boolean uploaded = getInt(getColumnIndex(ConversationSchema.ConversationTable.Cols.UPLOADED)) != 0;
 
-        return new Conversation(UUID.fromString(uuidString), new Date(date));
+        return new Conversation(UUID.fromString(uuidString), new Date(date), uploaded);
     }
 
 }
