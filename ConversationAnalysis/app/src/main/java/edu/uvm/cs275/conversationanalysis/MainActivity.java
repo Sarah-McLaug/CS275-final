@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
     *  button to close the menu, not the entire activity. */
     @Override
     public void onBackPressed(){
-        if(mNavDrawer.isDrawerOpen(GravityCompat.END)){
-            mNavDrawer.closeDrawer(GravityCompat.END);
+        if(mNavDrawer.isDrawerOpen(GravityCompat.START)){
+            mNavDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -67,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
         mMenuButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if(!mNavDrawer.isDrawerOpen(Gravity.RIGHT)){
-                    mNavDrawer.openDrawer(Gravity.RIGHT);
+                if(!mNavDrawer.isDrawerOpen(Gravity.LEFT)){
+                    mNavDrawer.openDrawer(Gravity.LEFT);
                 } else {
-                    mNavDrawer.closeDrawer(Gravity.LEFT);
+                    mNavDrawer.closeDrawer(Gravity.RIGHT);
                 }
             }
         });
