@@ -21,5 +21,4 @@ class ConversationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, vi
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
         return super().create(request, *args, **kwargs)
