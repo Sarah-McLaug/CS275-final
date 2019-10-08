@@ -84,6 +84,8 @@
     <!-- END: contents of activity -->
 
     <!-- BEGIN: Container for contents of drawer -->
+    <!-- If you want to change the drawer's opening side from left to right, change android:layout_gravity.
+         "end" = from the right-side. "start" = from the left side. -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
