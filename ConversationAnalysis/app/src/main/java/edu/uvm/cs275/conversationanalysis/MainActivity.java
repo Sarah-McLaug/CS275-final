@@ -18,10 +18,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton mRecordButton;
     private Button mMenuButton;
     private TextView mContactInfo;
+    private ConversationManager mConversationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = (DrawerLayout) findViewById(R.id.drawer_layout); // grab the navigation drawer
         buttonPress();
