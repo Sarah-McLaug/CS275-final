@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static String fileName = null;
+    private static String fileName = "audio.wav";
 
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
