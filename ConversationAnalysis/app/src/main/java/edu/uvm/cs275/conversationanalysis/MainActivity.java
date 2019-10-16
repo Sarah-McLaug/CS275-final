@@ -16,24 +16,23 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
+import java.util.Timer;
 
 import java.io.IOException;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static String fileName = null;
+    private static String fileName = "audio";
 
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
+    private ImageButton mStopButton;
     private Button mMenuButton;
     private TextView mContactInfo;
-    private MediaRecorder mRecorder;
+    private MediaRecorder mRecorder = new MediaRecorder();;
     private ConversationManager mConversationManager;
 
     private boolean recordPermission = false;
@@ -73,9 +72,8 @@ public class MainActivity extends AppCompatActivity {
         if(!recordPermission) finish();
     }
 
-    // This method starts recording audio
-    private void startRecording(){
-        mRecorder = new MediaRecorder();
+    // starts recording audio
+    private void startRecording() {
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mRecorder.setOutputFile(fileName);
@@ -87,23 +85,55 @@ public class MainActivity extends AppCompatActivity {
             Log.e(LOG_TAG, "prepare() failed");
         }
 
+        // start recording
         mRecorder.start();
+
+        // after 15 sec. do run() command which stops recording
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                stopRecording();
+            }
+        }, 15000);
+    }
+
+    // stops audio if user decides to end recording early
+    private void stopRecording() {
+        mRecorder.stop();
+        Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
     }
 
     // This method contains the calls for when a button is pressed.
     private void buttonPress() {
-        // Pressing the record button.
         mRecordButton = (ImageButton) findViewById(R.id.record_button);
-        /* This toast is a placeholder until we implement the recording function. */
+        mStopButton = (ImageButton) findViewById(R.id.stop_button);
+        mContactInfo = (TextView) findViewById(R.id.contact);
+        mMenuButton = (Button) findViewById(R.id.menu_button);
+
+        // pressing record button
+        // startRecording() method commented out because it crashes program --> think it has to do with no recorder working in emulator
         mRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, R.string.record_toast, Toast.LENGTH_SHORT).show();
+                mRecordButton.setVisibility(v.INVISIBLE);
+                mStopButton.setVisibility(v.VISIBLE);
+                // startRecording();
             }
         });
 
-        // Pressing "Contact Us"
-        mContactInfo = (TextView) findViewById(R.id.contact);
+        // pressing the stop button
+        // stopRecording() method commented out because it crashes program --> think it has to do with no recorder working in emulator
+        mStopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mStopButton.setVisibility(v.INVISIBLE);
+                mRecordButton.setVisibility(v.VISIBLE);
+                // stopRecording();
+            }
+        });
+
+        // pressing "Contact Us"
         mContactInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,8 +141,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Pressing the menu button
-        mMenuButton = (Button) findViewById(R.id.menu_button);
+        // pressing the menu button
         mMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
