@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -44,6 +45,8 @@ public class ProcessingActivity extends AppCompatActivity {
             // TODO: adding to database should be done when user taps the save button
             if (processAudio()) {
                 ConversationManager.getInstance(getApplicationContext()).addConversation(mConversation);
+            } else {
+                mConversation = null;
             }
 
             return mConversation;
@@ -51,6 +54,10 @@ public class ProcessingActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Conversation c) {
+            if (c == null) {
+                Toast.makeText(ProcessingActivity.this, R.string.error_processing, Toast.LENGTH_LONG).show();
+                return;
+            }
             final File imageFile = c.getImageFile(getApplicationContext()).toFile();
             if (imageFile == null) {
                 mGammatoneView.setImageDrawable(null);
@@ -69,9 +76,14 @@ public class ProcessingActivity extends AppCompatActivity {
     }
 
     protected boolean processAudio() {
+        File inFile = getAudioFile(getApplicationContext());
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
-        File inFile = getAudioFile(getApplicationContext());
+
+        if (!inFile.exists()) {
+            return false;
+        }
+
         if (!imageDir.toFile().exists()) {
             if (!imageDir.toFile().mkdirs()) {
                 return false;
