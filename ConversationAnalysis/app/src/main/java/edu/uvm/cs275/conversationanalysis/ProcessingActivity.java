@@ -1,5 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -70,7 +71,7 @@ public class ProcessingActivity extends AppCompatActivity {
     protected boolean processAudio() {
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
-        File inFile = getApplicationContext().getFilesDir().toPath().resolve(AUDIO_FILE_NAME).toFile();
+        File inFile = getAudioFile(getApplicationContext());
         if (!imageDir.toFile().exists()) {
             if (!imageDir.toFile().mkdirs()) {
                 return false;
@@ -87,6 +88,10 @@ public class ProcessingActivity extends AppCompatActivity {
         }
 
         return outFile.exists();
+    }
+
+    public static File getAudioFile(Context context) {
+        return context.getFilesDir().toPath().resolve(AUDIO_FILE_NAME).toFile();
     }
 
 
