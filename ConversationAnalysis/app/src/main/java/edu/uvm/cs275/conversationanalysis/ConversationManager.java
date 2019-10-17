@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public class ConversationManager {
     private static ConversationManager sInstance;
     private Context mContext;
     private SQLiteDatabase mDatabase;
+    private static final String IMAGE_DIR_NAME = "images";
+    public static final String IMAGE_EXT = ".png";
 
     private ConversationManager(Context context) {
         mContext = context.getApplicationContext();
@@ -84,4 +87,9 @@ public class ConversationManager {
             return cursor.getConversation();
         }
     }
+
+    public Path getImageDir() {
+        return mContext.getFilesDir().toPath().resolve(IMAGE_DIR_NAME);
+    }
+
 }

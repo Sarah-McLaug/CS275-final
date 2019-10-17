@@ -1,5 +1,8 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.content.Context;
+
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,6 +16,10 @@ public class Conversation {
         this.mUUID = uuid;
         this.mDate = date;
         this.mUploaded = false;
+    }
+
+    public Conversation() {
+        this(UUID.randomUUID(), new Date(), false);
     }
 
     public UUID getUUID() {
@@ -37,5 +44,9 @@ public class Conversation {
 
     public void setUploaded(boolean uploaded) {
         mUploaded = uploaded;
+    }
+
+    public Path getImageFile(Context context) {
+        return ConversationManager.getInstance(context).getImageDir().resolve(this.mUUID.toString() + ConversationManager.IMAGE_EXT);
     }
 }
