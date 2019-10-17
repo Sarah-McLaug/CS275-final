@@ -8,4 +8,5 @@
     <string name="nav_view_title">View Data</string>
     <string name="open_nav_drawer">Navigation Drawer Open</string>
     <string name="close_nav_drawer">Navigation Drawer Closed</string>
+    <string name="error_processing">This conversation could not be processed. Try again.</string>
 </resources>
