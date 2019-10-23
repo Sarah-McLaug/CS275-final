@@ -6,4 +6,5 @@
     <color name="topbar_color">#007155</color>
     <color name="microphone_background">#66AC47</color>
     <color name="contact_color">#01533F</color>
+    <color name="cancel_color">#D11A2A</color>
 </resources>

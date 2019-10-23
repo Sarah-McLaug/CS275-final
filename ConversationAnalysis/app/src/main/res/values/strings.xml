@@ -9,4 +9,8 @@
     <string name="open_nav_drawer">Navigation Drawer Open</string>
     <string name="close_nav_drawer">Navigation Drawer Closed</string>
     <string name="error_processing">This conversation could not be processed. Try again.</string>
+    <string name="successful">Data collection successful</string>
+    <string name="send_data">Send data for research?</string>
+    <string name="send_button">Send</string>
+    <string name="cancel_button">Cancel</string>
 </resources>
