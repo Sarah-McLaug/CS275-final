@@ -1,5 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,11 +35,22 @@ public class ProcessingActivity extends AppCompatActivity {
 
         mConversation = new Conversation();
 
-        new ProcessAudioTask().execute();
+        new ProcessAudioTask(this).execute();
 
     }
 
     private class ProcessAudioTask extends AsyncTask<Void, Void, Conversation> {
+        private ProgressDialog dialog;
+
+        public ProcessAudioTask(ProcessingActivity activity) {
+            dialog = new ProgressDialog(activity);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("Processing audio...");
+        }
 
         @Override
         protected Conversation doInBackground(Void... params) {
@@ -54,6 +66,10 @@ public class ProcessingActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Conversation c) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
             if (c == null) {
                 Toast.makeText(ProcessingActivity.this, R.string.error_processing, Toast.LENGTH_LONG).show();
                 return;
