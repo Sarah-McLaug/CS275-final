@@ -13,4 +13,6 @@
     <string name="send_data">Send data for research?</string>
     <string name="send_button">Send</string>
     <string name="cancel_button">Cancel</string>
+    <string name="upload_success">Successfully uploaded conversation.</string>
+    <string name="upload_failure">Upload failed. Try again later.</string>
 </resources>
