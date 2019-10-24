@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,43 +80,46 @@ public class MainActivity extends AppCompatActivity {
                 recordPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        if (!recordPermission) finish();
     }
 
     // starts recording audio
     private void startRecording() {
+        // get permission if needed
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
+            return;
+        }
+
         Toast.makeText(MainActivity.this, R.string.record_toast, Toast.LENGTH_SHORT).show();
         mRecordButton.setVisibility(View.INVISIBLE);
         mStopButton.setVisibility(View.VISIBLE);
-//        TODO: make this not crash things; perhaps broken because emulator?
-//        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-//        mRecorder.setOutputFile(ProcessingActivity.getAudioFile(getApplicationContext()));
-//        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//
-//        try {
-//            mRecorder.prepare();
-//        } catch (IOException e){
-//            Log.e(LOG_TAG, "prepare() failed");
-//        }
-//
-//        // start recording
-//        mRecorder.start();
+
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        mRecorder.setOutputFile(ProcessingActivity.getAudioFile(getApplicationContext()));
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+            mRecorder.prepare();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "prepare() failed");
+        }
+
+        // start recording
+        mRecorder.start();
 
         // after 15 sec. do run() command which stops recording
         mRecordHandler = new Handler();
-        mRecordHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stopRecording();
-                completeRecording();
-            }
+        mRecordHandler.postDelayed(() -> {
+            stopRecording();
+            completeRecording();
         }, RECORDING_DURATION);
     }
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
-//        mRecorder.stop(); // TODO: make this not crash things; perhaps broken because emulator?
+//        mRecorder.stop();
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
