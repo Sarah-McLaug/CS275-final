@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
-//        mRecorder.stop();
+        mRecorder.stop();
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
@@ -137,45 +137,29 @@ public class MainActivity extends AppCompatActivity {
 
     // This method contains the calls for when a button is pressed.
     private void buttonPress() {
-        mRecordButton = (ImageButton) findViewById(R.id.record_button);
-        mStopButton = (ImageButton) findViewById(R.id.stop_button);
-        mContactInfo = (TextView) findViewById(R.id.contact);
-        mMenuButton = (Button) findViewById(R.id.menu_button);
+        mRecordButton = findViewById(R.id.record_button);
+        mStopButton = findViewById(R.id.stop_button);
+        mContactInfo = findViewById(R.id.contact);
+        mMenuButton = findViewById(R.id.menu_button);
 
         // pressing record button
-        mRecordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startRecording();
-            }
-        });
+        mRecordButton.setOnClickListener(v -> startRecording());
 
         // pressing the stop button
-        mStopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopRecording();
-                Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
-            }
+        mStopButton.setOnClickListener(v -> {
+            stopRecording();
+            Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
         });
 
         // pressing "Contact Us"
-        mContactInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContactInfo.setText(R.string.contact_email);
-            }
-        });
+        mContactInfo.setOnClickListener(v -> mContactInfo.setText(R.string.contact_email));
 
         // pressing the menu button
-        mMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mNavDrawer.isDrawerOpen(Gravity.LEFT)) {
-                    mNavDrawer.openDrawer(Gravity.LEFT);
-                } else {
-                    mNavDrawer.closeDrawer(Gravity.RIGHT);
-                }
+        mMenuButton.setOnClickListener(v -> {
+            if (!mNavDrawer.isDrawerOpen(Gravity.LEFT)) {
+                mNavDrawer.openDrawer(Gravity.LEFT);
+            } else {
+                mNavDrawer.closeDrawer(Gravity.RIGHT);
             }
         });
     }
