@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav -->
+    tools:openDrawer="start"> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav. "start" opens the nav. -->
 
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
