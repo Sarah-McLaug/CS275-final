@@ -28,6 +28,23 @@ android {
     }
 }
 
+def getAPIURL() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("APIURL");
+}
+
+android {
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    defaultConfig {
+        buildConfigField "String", "APIURL", "\""+getAPIURL()+"\""
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -36,4 +53,5 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.google.android.material:material:1.1.0-beta01'
+    implementation 'com.loopj.android:android-async-http:1.4.9'
 }

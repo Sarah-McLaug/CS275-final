@@ -1,6 +1,7 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final int RECORDING_DURATION = 15000;
 
+    private static final String EXTRA_CONVERSATION_DISCARDED = "edu.uvm.cs275.conversationanalysis.conversation_discarded";
+
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
     private ImageButton mStopButton;
@@ -42,7 +45,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
-        mNavDrawer = (DrawerLayout) findViewById(R.id.drawer_layout); // grab the navigation drawer
+        mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
+
+        if (getIntent().getBooleanExtra(EXTRA_CONVERSATION_DISCARDED, false)) {
+            Toast.makeText(this, R.string.error_recording, Toast.LENGTH_SHORT).show();
+        }
+
         buttonPress();
     }
 
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
-        if(mRecordHandler != null){
+        if (mRecordHandler != null) {
             mRecordHandler.removeCallbacksAndMessages(null);
         }
     }
@@ -163,5 +171,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public static Intent newIntent(Context context, boolean conversationDiscarded) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(EXTRA_CONVERSATION_DISCARDED, conversationDiscarded);
+        return intent;
     }
 }

@@ -1,10 +1,14 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -21,8 +25,9 @@ public class ProcessingActivity extends AppCompatActivity {
     public static final String AUDIO_FILE_NAME = "audio.wav";
 
     private Conversation mConversation;
-
     private ImageView mGammatoneView;
+    private Button mSendButton;
+    private Button mCancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,28 +37,64 @@ public class ProcessingActivity extends AppCompatActivity {
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
 
+        mSendButton = this.findViewById(R.id.send_data);
+        mSendButton.setOnClickListener((View v) -> {
+            // TODO: transition screen to detail view and do upload there
+            ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
+            cm.addConversation(mConversation);
+            ProgressDialog dialog = new ProgressDialog(ProcessingActivity.this);
+            dialog.setMessage("Uploading audio...");
+            dialog.show();
+            if (cm.uploadConversation(mConversation)) {
+                Toast.makeText(this, R.string.upload_success, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.upload_failure, Toast.LENGTH_SHORT).show();
+            }
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
+
+        mCancelButton = this.findViewById(R.id.cancel_data);
+        mCancelButton.setOnClickListener((View v) -> {
+            mConversation = null;
+            Intent intent = MainActivity.newIntent(ProcessingActivity.this, true);
+            startActivity(intent);
+        });
+
         mConversation = new Conversation();
 
-        new ProcessAudioTask().execute();
+        new ProcessAudioTask(this).execute();
 
     }
 
     private class ProcessAudioTask extends AsyncTask<Void, Void, Conversation> {
+        private ProgressDialog dialog;
+
+        public ProcessAudioTask(ProcessingActivity activity) {
+            dialog = new ProgressDialog(activity);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("Processing audio...");
+        }
 
         @Override
         protected Conversation doInBackground(Void... params) {
-            // TODO: adding to database should be done when user taps the save button
-            if (processAudio()) {
-                ConversationManager.getInstance(getApplicationContext()).addConversation(mConversation);
-            } else {
+            if (!processAudio()) {
                 mConversation = null;
             }
-
             return mConversation;
         }
 
         @Override
         protected void onPostExecute(Conversation c) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
             if (c == null) {
                 Toast.makeText(ProcessingActivity.this, R.string.error_processing, Toast.LENGTH_LONG).show();
                 return;
