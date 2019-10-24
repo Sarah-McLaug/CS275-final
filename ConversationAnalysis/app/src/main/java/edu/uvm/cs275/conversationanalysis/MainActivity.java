@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
 
     // transitions to processing activity after successful recording
     private void completeRecording() {
-        // TODO: pass necessary data
         Intent intent = new Intent(MainActivity.this, ProcessingActivity.class);
         startActivity(intent);
     }
