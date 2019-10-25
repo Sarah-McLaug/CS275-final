@@ -16,6 +16,7 @@ import edu.uvm.cs275.conversationanalysis.ConversationManager;
 public class DetailView extends AppCompatActivity {
 
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
