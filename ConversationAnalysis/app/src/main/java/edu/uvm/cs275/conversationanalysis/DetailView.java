@@ -6,13 +6,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -21,7 +25,7 @@ import java.util.UUID;
 import edu.uvm.cs275.conversationanalysis.Conversation;
 import edu.uvm.cs275.conversationanalysis.ConversationManager;
 
-public class DetailView extends AppCompatActivity {
+public class DetailView extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
 
@@ -51,8 +55,11 @@ public class DetailView extends AppCompatActivity {
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
 
-
         mMenuButton = findViewById(R.id.menu_button);
+        mDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_view);
 
         // pressing the menu button
         mMenuButton.setOnClickListener(v -> {
@@ -73,6 +80,20 @@ public class DetailView extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item){
+        switch (item.getItemId()){
+            case R.id.nav_view:
+                Intent intent = new Intent(this, ConversationList.class);
+                startActivity(intent);
+                break;
+            case R.id.nav_record:
+                // Do nothing because we're already on that activity.
+                break;
+        }
+        return true;
     }
 
 }
