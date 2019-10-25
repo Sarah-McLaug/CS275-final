@@ -45,21 +45,26 @@ public class ProcessingActivity extends AppCompatActivity {
             ProgressDialog dialog = new ProgressDialog(ProcessingActivity.this);
             dialog.setMessage("Uploading audio...");
             dialog.show();
+            Intent returnIntent = new Intent();
             if (cm.uploadConversation(mConversation)) {
-                Toast.makeText(this, R.string.upload_success, Toast.LENGTH_SHORT).show();
+                setResult(MainActivity.RESULT_OK, returnIntent);
             } else {
-                Toast.makeText(this, R.string.upload_failure, Toast.LENGTH_SHORT).show();
+                setResult(MainActivity.RESULT_FAILURE, returnIntent);
             }
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+
+            finish();
         });
 
         mCancelButton = this.findViewById(R.id.cancel_data);
         mCancelButton.setOnClickListener((View v) -> {
+            mConversation.getImageFile(getApplicationContext()).toFile().delete();
             mConversation = null;
-            Intent intent = MainActivity.newIntent(ProcessingActivity.this, true);
-            startActivity(intent);
+            Intent returnIntent = new Intent();
+            setResult(MainActivity.RESULT_CANCELED, returnIntent);
+            finish();
         });
 
         mConversation = new Conversation();
@@ -96,7 +101,9 @@ public class ProcessingActivity extends AppCompatActivity {
             }
 
             if (c == null) {
-                Toast.makeText(ProcessingActivity.this, R.string.error_processing, Toast.LENGTH_LONG).show();
+                Intent returnIntent = new Intent();
+                setResult(MainActivity.RESULT_FAILURE, returnIntent);
+                finish();
                 return;
             }
             final File imageFile = c.getImageFile(getApplicationContext()).toFile();

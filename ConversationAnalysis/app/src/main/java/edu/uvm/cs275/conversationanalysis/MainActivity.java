@@ -1,7 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
@@ -29,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final int RECORDING_DURATION = 15000;
 
-    private static final String EXTRA_CONVERSATION_DISCARDED = "edu.uvm.cs275.conversationanalysis.conversation_discarded";
+    private static final int PROCESSING_RESULT = 1;
+    public static final int RESULT_FAILURE = 2;
 
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
@@ -50,10 +50,6 @@ public class MainActivity extends AppCompatActivity {
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
-
-        if (getIntent().getBooleanExtra(EXTRA_CONVERSATION_DISCARDED, false)) {
-            Toast.makeText(this, R.string.error_recording, Toast.LENGTH_SHORT).show();
-        }
 
         buttonPress();
     }
@@ -79,6 +75,20 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 recordPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PROCESSING_RESULT) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(getApplicationContext(), R.string.successful, Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(getApplicationContext(), R.string.error_recording, Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_FAILURE) {
+                Toast.makeText(getApplicationContext(), R.string.error_processing, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -112,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         // after 15 sec. do run() command which stops recording
         mRecordHandler = new Handler();
         mRecordHandler.postDelayed(() -> {
+            mRecordButton.setEnabled(false);
+            mStopButton.setEnabled(false);
             stopRecording();
             completeRecording();
         }, RECORDING_DURATION);
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     // transitions to processing activity after successful recording
     private void completeRecording() {
         Intent intent = new Intent(MainActivity.this, ProcessingActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, PROCESSING_RESULT);
     }
 
     // This method contains the calls for when a button is pressed.
@@ -161,11 +173,5 @@ public class MainActivity extends AppCompatActivity {
                 mNavDrawer.closeDrawer(Gravity.RIGHT);
             }
         });
-    }
-
-    public static Intent newIntent(Context context, boolean conversationDiscarded) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(EXTRA_CONVERSATION_DISCARDED, conversationDiscarded);
-        return intent;
     }
 }
