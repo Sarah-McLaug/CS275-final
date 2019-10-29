@@ -43,7 +43,7 @@ public class ConversationList extends AppCompatActivity {
 
         public void bind(Conversation c) {
             mConversation = c;
-            mDateTextView.setText(mConversation.getDate().toString()); //TODO: Format differently later
+            mDateTextView.setText(mConversation.getDate().toString()); //TODO: Format date in a normal way
         }
 
         @Override
