@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,10 +21,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
+
 import java.io.IOException;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -50,9 +56,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // initialize audio converter
+        AndroidAudioConverter.load(this, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "AudioConverter success!");
+            }
+            @Override
+            public void onFailure(Exception error) {
+                Log.i(LOG_TAG, "FFmpeg is not supported by device");
+            }
+        });
+
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_record);
 
         buttonPress();
     }
@@ -118,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     private void startRecording() {
         // get permission if needed
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
             return;
         }
@@ -195,5 +216,20 @@ public class MainActivity extends AppCompatActivity {
                 mNavDrawer.closeDrawer(Gravity.RIGHT);
             }
         });
+    }
+
+    // This method handles what happens when you click on a nav menu item.
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item){
+        switch (item.getItemId()){
+            case R.id.nav_view:
+                Intent intent = new Intent(this, ConversationList.class);
+                startActivity(intent);
+                break;
+            case R.id.nav_record:
+                // Do nothing because we're already on that activity.
+                break;
+        }
+        return true;
     }
 }
