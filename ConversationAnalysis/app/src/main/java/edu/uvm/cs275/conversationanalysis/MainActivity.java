@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    // This method handles what happens when you click on a nav menu item.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item){
         switch (item.getItemId()){
