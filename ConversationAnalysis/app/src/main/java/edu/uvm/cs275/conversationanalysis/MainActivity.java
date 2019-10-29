@@ -21,6 +21,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PROCESSING_RESULT = 1;
     public static final int RESULT_FAILURE = 2;
+    private static final String RESULT_INTENT_UUID = "edu.uvm.cs275.conversationanalysis.conversation_uuid";
 
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean recordPermission = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
         mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
 
         buttonPress();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mRecordButton.setEnabled(true);
+        mStopButton.setEnabled(true);
     }
 
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
@@ -78,12 +88,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static Intent newReturnIntent(Conversation conversation) {
+        Intent intent = new Intent();
+        if (conversation != null) {
+            intent.putExtra(RESULT_INTENT_UUID, conversation.getUUID());
+        }
+        return intent;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PROCESSING_RESULT) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(getApplicationContext(), R.string.successful, Toast.LENGTH_SHORT).show();
+                UUID conversationUUID = (UUID) data.getSerializableExtra(RESULT_INTENT_UUID);
+                Conversation conversation = ConversationManager.getInstance(getApplicationContext()).getConversation(conversationUUID);
+                Intent intent = DetailView.newIntent(this, conversation);
+                startActivity(intent);
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getApplicationContext(), R.string.error_recording, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_FAILURE) {

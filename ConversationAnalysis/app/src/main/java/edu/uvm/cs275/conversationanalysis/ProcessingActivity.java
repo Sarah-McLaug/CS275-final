@@ -40,22 +40,12 @@ public class ProcessingActivity extends AppCompatActivity {
 
         mSendButton = this.findViewById(R.id.send_data);
         mSendButton.setOnClickListener((View v) -> {
-            // TODO: transition screen to detail view and do upload there
+            // save to db
             ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
             cm.addConversation(mConversation);
-            ProgressDialog dialog = new ProgressDialog(ProcessingActivity.this);
-            dialog.setMessage("Uploading audio...");
-            dialog.show();
-            Intent returnIntent = new Intent();
-            if (cm.uploadConversation(mConversation)) {
-                setResult(MainActivity.RESULT_OK, returnIntent);
-            } else {
-                setResult(MainActivity.RESULT_FAILURE, returnIntent);
-            }
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
+            // return with OK and conversation
+            Intent returnIntent = MainActivity.newReturnIntent(mConversation);
+            setResult(MainActivity.RESULT_OK, returnIntent);
             finish();
         });
 
@@ -63,7 +53,7 @@ public class ProcessingActivity extends AppCompatActivity {
         mCancelButton.setOnClickListener((View v) -> {
             mConversation.getImageFile(getApplicationContext()).toFile().delete();
             mConversation = null;
-            Intent returnIntent = new Intent();
+            Intent returnIntent = MainActivity.newReturnIntent(null);
             setResult(MainActivity.RESULT_CANCELED, returnIntent);
             finish();
         });
