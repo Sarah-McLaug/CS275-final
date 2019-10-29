@@ -7,11 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -20,6 +22,15 @@ import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
 import java.nio.file.Path;
+
+import javax.security.auth.callback.Callback;
+
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
+import cafe.adriel.androidaudioconverter.model.AudioFormat;
+
+import static com.loopj.android.http.AsyncHttpClient.LOG_TAG;
 
 public class ProcessingActivity extends AppCompatActivity {
 
@@ -35,6 +46,18 @@ public class ProcessingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
         setupPython();
+
+        // initialize audio converter
+        AndroidAudioConverter.load(this, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "AudioConverter success!");
+            }
+            @Override
+            public void onFailure(Exception error) {
+                Log.i(LOG_TAG, "FFmpeg is not supported by device");
+            }
+        });
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
 
@@ -97,6 +120,7 @@ public class ProcessingActivity extends AppCompatActivity {
                 finish();
                 return;
             }
+
             final File imageFile = c.getImageFile(getApplicationContext()).toFile();
             if (imageFile == null) {
                 mGammatoneView.setImageDrawable(null);
@@ -116,6 +140,22 @@ public class ProcessingActivity extends AppCompatActivity {
 
     protected boolean processAudio() {
         File inFile = getAudioFile(getApplicationContext());
+
+        // convert inFile to .wav file
+        IConvertCallback callback = new IConvertCallback() {
+            @Override
+            public void onSuccess(File convertedFile) {
+                // success
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                // oops! something went wrong
+            }
+        };
+        // TODO: figure out why this isn't working
+        AndroidAudioConverter.with(ProcessingActivity.this).setFile(inFile).setFormat(AudioFormat.WAV).setCallback(callback).convert();
+
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
 
@@ -144,6 +184,4 @@ public class ProcessingActivity extends AppCompatActivity {
     public static File getAudioFile(Context context) {
         return context.getFilesDir().toPath().resolve(AUDIO_FILE_NAME).toFile();
     }
-
-
 }
