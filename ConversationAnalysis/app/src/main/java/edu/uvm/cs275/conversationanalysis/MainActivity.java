@@ -25,6 +25,9 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
 
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = "Audio Recording";
@@ -50,6 +53,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // initialize audio converter
+        AndroidAudioConverter.load(this, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "AudioConverter success!");
+            }
+            @Override
+            public void onFailure(Exception error) {
+                Log.i(LOG_TAG, "FFmpeg is not supported by device");
+            }
+        });
+
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
