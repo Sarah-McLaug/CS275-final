@@ -211,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
                 break;
             case R.id.nav_record:
-                // Do nothing because we're already on that activity.
+                Intent test = new Intent(this, DetailView.class);
+                startActivity(test);
                 break;
         }
         return true;
