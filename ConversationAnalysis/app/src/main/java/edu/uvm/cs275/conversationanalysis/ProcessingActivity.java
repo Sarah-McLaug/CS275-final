@@ -133,7 +133,9 @@ public class ProcessingActivity extends AppCompatActivity {
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
 
+
         if (!inFile.exists()) {
+            Log.d("inFile", "The inFile does not exist");
             return false;
         }
 
