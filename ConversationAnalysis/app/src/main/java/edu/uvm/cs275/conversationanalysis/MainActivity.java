@@ -26,9 +26,6 @@ import com.google.android.material.navigation.NavigationView;
 import java.io.IOException;
 import java.util.UUID;
 
-import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
-import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = "Audio Recording";
@@ -56,19 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // initialize audio converter
-        AndroidAudioConverter.load(this, new ILoadCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i(LOG_TAG, "AudioConverter success!");
-            }
-            @Override
-            public void onFailure(Exception error) {
-                Log.i(LOG_TAG, "FFmpeg is not supported by device");
-            }
-        });
-
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
@@ -149,9 +133,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mStopButton.setVisibility(View.VISIBLE);
 
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-        mRecorder.setOutputFile(ProcessingActivity.getAudioFile(getApplicationContext()));
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        mRecorder.setOutputFile(ProcessingActivity.getRawAudioFile(getApplicationContext()));
 
         try {
             mRecorder.prepare();
@@ -175,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // stops audio if user decides to end recording early
     private void stopRecording() {
         mRecorder.stop();
+        mRecorder.reset();
+        mRecorder.release();
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
@@ -220,8 +206,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // This method handles what happens when you click on a nav menu item.
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item){
-        switch (item.getItemId()){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.nav_view:
                 Intent intent = new Intent(this, ConversationList.class);
                 startActivity(intent);

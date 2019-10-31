@@ -11,30 +11,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
 import java.nio.file.Path;
 
-import javax.security.auth.callback.Callback;
-
-import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
-import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
-import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
-import cafe.adriel.androidaudioconverter.model.AudioFormat;
-
-import static com.loopj.android.http.AsyncHttpClient.LOG_TAG;
-
 public class ProcessingActivity extends AppCompatActivity {
 
     public static final String AUDIO_FILE_NAME = "audio.wav";
+    public static final String RAW_AUDIO_FILE_NAME = "audio.aac";
+    private static final String TAG = "ProcessingActivity";
 
     private Conversation mConversation;
     private ImageView mGammatoneView;
@@ -46,18 +37,6 @@ public class ProcessingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
         setupPython();
-
-        // initialize audio converter
-        AndroidAudioConverter.load(this, new ILoadCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i(LOG_TAG, "AudioConverter success!");
-            }
-            @Override
-            public void onFailure(Exception error) {
-                Log.i(LOG_TAG, "FFmpeg is not supported by device");
-            }
-        });
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
 
@@ -84,7 +63,6 @@ public class ProcessingActivity extends AppCompatActivity {
         mConversation = new Conversation();
 
         new ProcessAudioTask(this).execute();
-
     }
 
     private class ProcessAudioTask extends AsyncTask<Void, Void, Conversation> {
@@ -139,23 +117,19 @@ public class ProcessingActivity extends AppCompatActivity {
     }
 
     protected boolean processAudio() {
+        File audioInputFile = getRawAudioFile(getApplicationContext());
+        FFmpeg.execute(String.format("-i %s %s -y", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
+        int rc = FFmpeg.getLastReturnCode();
+        if (rc == FFmpeg.RETURN_CODE_SUCCESS) {
+            Log.i(TAG, "Command execution completed successfully.");
+        } else if (rc == FFmpeg.RETURN_CODE_CANCEL) {
+            Log.i(TAG, "Command execution cancelled by user.");
+        } else {
+            Log.i(TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+            FFmpeg.printLastCommandOutput(Log.INFO);
+        }
+
         File inFile = getAudioFile(getApplicationContext());
-
-        // convert inFile to .wav file
-        IConvertCallback callback = new IConvertCallback() {
-            @Override
-            public void onSuccess(File convertedFile) {
-                // success
-            }
-
-            @Override
-            public void onFailure(Exception error) {
-                // oops! something went wrong
-            }
-        };
-        // TODO: figure out why this isn't working
-        AndroidAudioConverter.with(ProcessingActivity.this).setFile(inFile).setFormat(AudioFormat.WAV).setCallback(callback).convert();
-
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
 
@@ -183,5 +157,9 @@ public class ProcessingActivity extends AppCompatActivity {
 
     public static File getAudioFile(Context context) {
         return context.getFilesDir().toPath().resolve(AUDIO_FILE_NAME).toFile();
+    }
+
+    public static File getRawAudioFile(Context context) {
+        return context.getFilesDir().toPath().resolve(RAW_AUDIO_FILE_NAME).toFile();
     }
 }
