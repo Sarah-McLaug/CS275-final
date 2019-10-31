@@ -145,23 +145,25 @@ public class ProcessingActivity extends AppCompatActivity {
         IConvertCallback callback = new IConvertCallback() {
             @Override
             public void onSuccess(File convertedFile) {
-                // success
+                Log.d("IConvertCallback", "Success!");
             }
 
             @Override
             public void onFailure(Exception error) {
-                // oops! something went wrong
+                Log.d("IConvertCallBack", "Failure.");
             }
         };
         // TODO: figure out why this isn't working
+
+        if (!inFile.exists()) {
+            Log.d("inFile", "The inFile does not exist");
+            return false;
+        }
+
         AndroidAudioConverter.with(ProcessingActivity.this).setFile(inFile).setFormat(AudioFormat.WAV).setCallback(callback).convert();
 
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
-
-        if (!inFile.exists()) {
-            return false;
-        }
 
         if (!imageDir.toFile().exists()) {
             if (!imageDir.toFile().mkdirs()) {
