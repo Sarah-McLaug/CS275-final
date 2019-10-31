@@ -118,7 +118,7 @@ public class ProcessingActivity extends AppCompatActivity {
 
     protected boolean processAudio() {
         File audioInputFile = getRawAudioFile(getApplicationContext());
-        FFmpeg.execute(String.format("-i %s %s -y", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
+        FFmpeg.execute(String.format("-i %s -ac 2 -y %s", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
         int rc = FFmpeg.getLastReturnCode();
         if (rc == FFmpeg.RETURN_CODE_SUCCESS) {
             Log.i(TAG, "Command execution completed successfully.");
