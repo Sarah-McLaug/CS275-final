@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
 
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
 
-    private ImageView mImage;
+    private PhotoView mImage;
     private TextView mUUID;
     private DrawerLayout mDrawer;
     private Button mMenuButton;
@@ -48,7 +49,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         File image =  imagePath.toFile();
 
         mDrawer = findViewById(R.id.drawer_layout);
-        mImage = findViewById(R.id.gammatone);
+        mImage = findViewById(R.id.photo_view);
         mUUID = findViewById(R.id.uuid);
 
         mUUID.setText(UUID_string);
