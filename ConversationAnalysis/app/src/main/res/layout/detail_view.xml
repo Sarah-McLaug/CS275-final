@@ -68,7 +68,6 @@
             android:layout_height="wrap_content"
             android:text="UUID"
             android:textAlignment="center"
-            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
