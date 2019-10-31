@@ -1,14 +1,14 @@
 package edu.uvm.cs275.conversationanalysis.api;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 
 import edu.uvm.cs275.conversationanalysis.BuildConfig;
 
 public class ConversationAPIClient {
     private static final String BASE_URL = BuildConfig.APIURL + "api";
-    private static AsyncHttpClient sClient = new AsyncHttpClient();
+    private static SyncHttpClient sClient = new SyncHttpClient();
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         sClient.get(getAbsoluteUrl(url), params, responseHandler);

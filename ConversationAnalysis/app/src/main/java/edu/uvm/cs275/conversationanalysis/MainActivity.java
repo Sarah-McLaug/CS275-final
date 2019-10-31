@@ -24,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final int PROCESSING_RESULT = 1;
     public static final int RESULT_FAILURE = 2;
+    private static final String RESULT_INTENT_UUID = "edu.uvm.cs275.conversationanalysis.conversation_uuid";
 
     private DrawerLayout mNavDrawer;
     private ImageButton mRecordButton;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean recordPermission = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +61,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setCheckedItem(R.id.nav_record);
 
         buttonPress();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mRecordButton.setEnabled(true);
+        mStopButton.setEnabled(true);
     }
 
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
@@ -84,12 +94,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public static Intent newReturnIntent(Conversation conversation) {
+        Intent intent = new Intent();
+        if (conversation != null) {
+            intent.putExtra(RESULT_INTENT_UUID, conversation.getUUID());
+        }
+        return intent;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PROCESSING_RESULT) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(getApplicationContext(), R.string.successful, Toast.LENGTH_SHORT).show();
+                UUID conversationUUID = (UUID) data.getSerializableExtra(RESULT_INTENT_UUID);
+                Conversation conversation = ConversationManager.getInstance(getApplicationContext()).getConversation(conversationUUID);
+                Intent intent = DetailView.newIntent(this, conversation);
+                startActivity(intent);
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getApplicationContext(), R.string.error_recording, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_FAILURE) {
@@ -111,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mStopButton.setVisibility(View.VISIBLE);
 
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         mRecorder.setOutputFile(ProcessingActivity.getAudioFile(getApplicationContext()));
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 

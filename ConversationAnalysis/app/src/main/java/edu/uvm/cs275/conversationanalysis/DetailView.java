@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,11 +25,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import edu.uvm.cs275.conversationanalysis.Conversation;
-import edu.uvm.cs275.conversationanalysis.ConversationManager;
-
 public class DetailView extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "DetailView";
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
 
     private PhotoView mImage;
@@ -35,8 +35,10 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
     private DrawerLayout mDrawer;
     private Button mMenuButton;
 
+    private Conversation mConversation;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_view);
 
@@ -44,9 +46,9 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         String UUID_string = "ID: " + gammatoneID;
 
         ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
-        Conversation conversation = cm.getConversation(gammatoneID);
-        Path imagePath = conversation.getImageFile(getApplicationContext());
-        File image =  imagePath.toFile();
+        mConversation = cm.getConversation(gammatoneID);
+        Path imagePath = mConversation.getImageFile(getApplicationContext());
+        File image = imagePath.toFile();
 
         mDrawer = findViewById(R.id.drawer_layout);
         mImage = findViewById(R.id.photo_view);
@@ -70,6 +72,19 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
                 mDrawer.closeDrawer(Gravity.RIGHT);
             }
         });
+
+        if (!mConversation.isUploaded()) {
+            Log.d(TAG, "Uploading conversation...");
+            new ConversationManager.UploadTask(getApplicationContext(), (Boolean result) -> {
+                if (result) {
+                    Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
+                    Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
+                } else {
+                    Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
+                    Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
+                }
+            }).execute(mConversation);
+        }
     }
 
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
@@ -83,10 +98,17 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         }
     }
 
+    public static Intent newIntent(Context context, Conversation conversation) {
+        Intent intent = new Intent(context, DetailView.class);
+        intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
+        return intent;
+    }
+
+
     // This method handles what happens when you click on a nav menu item.
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item){
-        switch (item.getItemId()){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.nav_view:
                 Intent intent = new Intent(this, ConversationList.class);
                 startActivity(intent);

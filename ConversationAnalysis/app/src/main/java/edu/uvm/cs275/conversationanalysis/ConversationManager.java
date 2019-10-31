@@ -1,11 +1,10 @@
 package edu.uvm.cs275.conversationanalysis;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -32,9 +31,9 @@ import edu.uvm.cs275.conversationanalysis.db.ConversationCursorWrapper;
 import edu.uvm.cs275.conversationanalysis.db.ConversationSchema.ConversationTable;
 
 public class ConversationManager {
+    public static final String IMAGE_EXT = ".png";
     private static final String TAG = "ConversationManager";
     private static final String IMAGE_DIR_NAME = "images";
-    public static final String IMAGE_EXT = ".png";
     private static final String PREFS_NAME = "CONVERSATION_PREFS";
     private static final String DEVICE_UUID = "DEVICE_UUID";
 
@@ -54,6 +53,7 @@ public class ConversationManager {
             editor.apply();
         }
         mDeviceUUID = UUID.fromString(settings.getString(DEVICE_UUID, null));
+        Log.i(TAG, "Device UUID: " + mDeviceUUID.toString());
     }
 
     public static ConversationManager getInstance(Context context) {
@@ -67,6 +67,7 @@ public class ConversationManager {
         ContentValues values = new ContentValues();
         values.put(ConversationTable.Cols.UUID, c.getUUID().toString());
         values.put(ConversationTable.Cols.DATE, c.getDate().getTime());
+        values.put(ConversationTable.Cols.UPLOADED, c.isUploaded());
         return values;
     }
 
@@ -124,7 +125,8 @@ public class ConversationManager {
     }
 
     // returns true if conversation has been successfully uploaded, either now, or in the past
-    public boolean uploadConversation(final Conversation conversation) {
+    private boolean uploadConversation(final Conversation conversation) {
+        Log.i(TAG, "uploadConversation");
         if (conversation.isUploaded()) {
             return true;
         }
@@ -168,6 +170,40 @@ public class ConversationManager {
         });
 
         return conversation.isUploaded();
+    }
+
+    public static class UploadTask extends AsyncTask<Conversation, Void, Boolean> {
+
+
+        private final TaskListener mTaskListener;
+        private ConversationManager mConversationManager;
+
+        public UploadTask(Context context, TaskListener listener) {
+            mConversationManager = getInstance(context);
+            this.mTaskListener = listener;
+        }
+
+        @Override
+        protected Boolean doInBackground(Conversation... conversations) {
+            System.out.println(conversations.length);
+            System.out.println(conversations.length != 1);
+            if (conversations.length != 1) {
+                return false;
+            }
+            return mConversationManager.uploadConversation(conversations[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (this.mTaskListener != null) {
+                this.mTaskListener.onFinished(result);
+            }
+        }
+
+        public interface TaskListener {
+            void onFinished(Boolean result);
+        }
     }
 
 }
