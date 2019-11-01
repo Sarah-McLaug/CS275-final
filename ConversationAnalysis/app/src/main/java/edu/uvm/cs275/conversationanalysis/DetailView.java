@@ -58,7 +58,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
 
-        mMenuButton = findViewById(R.id.menu_button);
+        mMenuButton = findViewById(R.id.detail_menu_button);
         mDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -109,12 +109,13 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.nav_view:
-                Intent intent = new Intent(this, ConversationList.class);
-                startActivity(intent);
-                break;
             case R.id.nav_record:
-                // Do nothing because we're already on that activity.
+                Intent record_intent = new Intent(this, MainActivity.class);
+                startActivity(record_intent);
+                break;
+            case R.id.nav_view:
+                Intent view_intent = new Intent(this, ConversationList.class);
+                startActivity(view_intent);
                 break;
         }
         return true;
