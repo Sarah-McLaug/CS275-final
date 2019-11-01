@@ -14,10 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConversationList extends AppCompatActivity {
     private RecyclerView mRecyclerView;
+    private ConversationAdapter mAdapter;
+    private LayoutInflater mLayoutInflater;
+
+    @Override
+    public void onCreate(Bundle savedInstanceBundle){
+        super.onCreate(savedInstanceBundle);
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -26,7 +34,20 @@ public class ConversationList extends AppCompatActivity {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        updateUI();
+
         return v;
+    }
+
+    private void updateUI() {
+        List<Conversation> conversations = new ArrayList<>();
+        for(int i = 0; i < 20; i++){
+            Conversation c = new Conversation();
+            conversations.add(c);
+        }
+
+        mAdapter = new ConversationAdapter(conversations);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private class ConversationHolder extends RecyclerView.ViewHolder
@@ -36,11 +57,11 @@ public class ConversationList extends AppCompatActivity {
         private ImageView mImageView;
 
         public ConversationHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.conversation_list, parent, false));
+            super(inflater.inflate(R.layout.conversation_list_item, parent, false));
             itemView.setOnClickListener(this);
 
             mDateTextView = (TextView) itemView.findViewById(R.id.conversation_date);
-            mImageView = (ImageView) itemView.findViewById(R.id.gammatone);
+            //mImageView = (ImageView) itemView.findViewById(R.id.gammatone);
         }
 
         public void bind(Conversation c) {
