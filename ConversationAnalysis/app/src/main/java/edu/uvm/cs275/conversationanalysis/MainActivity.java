@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mRecordButton = findViewById(R.id.record_button);
         mStopButton = findViewById(R.id.stop_button);
         mContactInfo = findViewById(R.id.contact);
-        mMenuButton = findViewById(R.id.menu_button);
+        mMenuButton = findViewById(R.id.main_menu_button);
 
         // pressing record button
         mRecordButton.setOnClickListener(v -> startRecording());

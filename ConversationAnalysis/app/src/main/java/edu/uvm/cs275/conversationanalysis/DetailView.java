@@ -29,6 +29,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
 
     private static final String TAG = "DetailView";
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
+    private static final String UUID_Index = "UUID_Index";
 
     private PhotoView mImage;
     private TextView mUUID;
@@ -42,7 +43,12 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_view);
 
-        UUID gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
+        UUID gammatoneID;
+        if(savedInstanceState == null){
+            gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
+        } else {
+            gammatoneID = UUID.fromString( (String) savedInstanceState.getCharSequence(UUID_Index));
+        }
         String UUID_string = "ID: " + gammatoneID;
 
         ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
@@ -58,7 +64,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
 
-        mMenuButton = findViewById(R.id.menu_button);
+        mMenuButton = findViewById(R.id.detail_menu_button);
         mDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -105,16 +111,24 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
     }
 
 
+    // This method handles what happens when the screen rotates
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(UUID_Index, mUUID.toString());
+    }
+
     // This method handles what happens when you click on a nav menu item.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.nav_view:
-                Intent intent = new Intent(this, ConversationList.class);
-                startActivity(intent);
-                break;
             case R.id.nav_record:
-                // Do nothing because we're already on that activity.
+                Intent record_intent = new Intent(this, MainActivity.class);
+                startActivity(record_intent);
+                break;
+            case R.id.nav_view:
+                Intent view_intent = new Intent(this, ConversationList.class);
+                startActivity(view_intent);
                 break;
         }
         return true;
