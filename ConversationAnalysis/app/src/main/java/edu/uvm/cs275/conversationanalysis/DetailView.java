@@ -29,6 +29,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
 
     private static final String TAG = "DetailView";
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
+    private static final String UUID_Index = "UUID_Index";
 
     private PhotoView mImage;
     private TextView mUUID;
@@ -42,7 +43,12 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_view);
 
-        UUID gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
+        UUID gammatoneID;
+        if(savedInstanceState == null){
+            gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
+        } else {
+            gammatoneID = UUID.fromString( (String) savedInstanceState.getCharSequence(UUID_Index));
+        }
         String UUID_string = "ID: " + gammatoneID;
 
         ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
@@ -104,6 +110,13 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
         return intent;
     }
 
+
+    // This method handles what happens when the screen rotates
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(UUID_Index, mUUID.toString());
+    }
 
     // This method handles what happens when you click on a nav menu item.
     @Override
