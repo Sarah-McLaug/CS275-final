@@ -1,8 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.os.Bundle;
-import android.os.Debug;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ConversationList extends AppCompatActivity {
+
     private RecyclerView mRecyclerView;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
