@@ -1,114 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SOURCE: https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer -->
-<!-- Addition help received from: https://www.youtube.com/watch?v=zYVEMCiDcmY&t=460s -->
-<!-- Use DrawerLayout as root container for activity -->
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer=""> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav. "start" opens the nav. -->
-
+    android:layout_height="match_parent">
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="608dp"
         tools:context=".MainActivity">
 
         <ImageView
             android:id="@+id/logo"
             android:layout_width="400dp"
             android:layout_height="100dp"
+            android:layout_marginBottom="80dp"
             android:src="@drawable/logo"
             app:layout_constraintBottom_toTopOf="@+id/record_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
+            app:layout_constraintHorizontal_bias="0.454"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/top_bar"
-            app:layout_constraintVertical_bias="0.443" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/top_bar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/topbar_color"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/record_button"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="-16dp">
+            app:layout_constraintVertical_bias="1.0" />
 
-            <Button
-                android:id="@+id/main_menu_button"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/menu_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/logo"
-                app:layout_constraintHorizontal_bias="0.154"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.625" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <ImageButton
-                android:id="@+id/record_button"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:background="@drawable/roundcorner"
-                android:visibility="visible"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_action_name"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.496"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.498" />
-
-            <ImageButton
-                android:id="@+id/stop_button"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:background="@drawable/roundcorner"
-                android:visibility="invisible"
-                android:scaleType="fitCenter"
-                android:src="@drawable/stop_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.496"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.498" />
-
-        <TextView
-            android:id="@+id/contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contact"
-            android:textColor="@color/contact_color"
-            android:textSize="20dp"
+        <ImageButton
+            android:id="@+id/record_button"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:background="@drawable/roundcorner"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_action_name"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_button"
-            app:layout_constraintVertical_bias="0.23" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.498" />
+
+        <ImageButton
+            android:id="@+id/stop_button"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:background="@drawable/roundcorner"
+            android:scaleType="fitCenter"
+            android:src="@drawable/stop_icon"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.498" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/microphone_background"
+        app:itemIconTint="@color/design_default_color_on_secondary"
+        app:itemTextColor="@color/design_default_color_on_secondary"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/nav_menu" />
     <!-- END: contents of activity -->
 
-    <!-- BEGIN: Container for contents of drawer -->
-    <!-- If you want to change the drawer's opening side from left to right, change android:layout_gravity.
-         "end" = from the right-side. "start" = from the left side. -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/nav_menu" />
-
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</LinearLayout>
