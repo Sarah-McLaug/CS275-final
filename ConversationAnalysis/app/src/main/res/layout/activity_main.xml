@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav. "start" opens the nav. -->
+    tools:openDrawer=""> <!-- openDrawer controls if the Navigation Drawer is showing in the preview. Remove it to get rid of the nav. "start" opens the nav. -->
 
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -82,19 +82,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.498" />
-
-        <TextView
-            android:id="@+id/contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contact"
-            android:textColor="@color/contact_color"
-            android:textSize="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_button"
-            app:layout_constraintVertical_bias="0.23" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- END: contents of activity -->
