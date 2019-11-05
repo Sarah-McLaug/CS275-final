@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void stopRecording() {
         mRecorder.stop();
         mRecorder.reset();
-        mRecorder.release();
+
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
