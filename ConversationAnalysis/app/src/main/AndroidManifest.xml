@@ -18,8 +18,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,6 +31,13 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".DetailView" />
         <activity android:name=".ConversationList"></activity>
+
+        <service
+            android:name=".service.BackgroundUploadService"
+            android:exported="false" />
+        <receiver
+            android:name=".service.BackgroundUploadReceiver"
+            android:process=":remote"></receiver>
     </application>
 
 </manifest>

@@ -1,32 +1,30 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import edu.uvm.cs275.conversationanalysis.service.BackgroundUploadReceiver;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
+        scheduleAlarm();
+
         mNavMenu = findViewById(R.id.bottom_navigation);
         BottomNavigationItemView navigationView = findViewById(R.id.nav_view);
 
@@ -66,6 +66,17 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mRecordButton.setEnabled(true);
         mStopButton.setEnabled(true);
+    }
+
+    public void scheduleAlarm() {
+        Intent intent = new Intent(getApplicationContext(), BackgroundUploadReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, BackgroundUploadReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long firstMillis = System.currentTimeMillis();
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // execute background service now, then roughly ever hour
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, AlarmManager.INTERVAL_HOUR, pIntent);
     }
 
     /* Override the permissions request result

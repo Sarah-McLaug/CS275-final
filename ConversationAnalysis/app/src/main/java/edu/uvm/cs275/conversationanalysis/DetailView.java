@@ -79,18 +79,18 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
             }
         });
 
-        if (!mConversation.isUploaded()) {
-            Log.d(TAG, "Uploading conversation...");
-            new ConversationManager.UploadTask(getApplicationContext(), (Boolean result) -> {
-                if (result) {
-                    Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
-                } else {
-                    Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
-                }
-            }).execute(mConversation);
-        }
+//        if (!mConversation.isUploaded()) {
+//            Log.d(TAG, "Uploading conversation...");
+//            new ConversationManager.UploadTask(getApplicationContext(), (Boolean result) -> {
+//                if (result) {
+//                    Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
+//                    Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
+//                } else {
+//                    Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
+//                    Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
+//                }
+//            }).execute(mConversation);
+//        }
     }
 
     /* Override the back button if the navigation drawer is open. If it is open, we want the back
