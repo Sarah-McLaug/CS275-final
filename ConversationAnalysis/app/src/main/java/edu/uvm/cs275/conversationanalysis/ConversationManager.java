@@ -36,6 +36,7 @@ public class ConversationManager {
     private static final String IMAGE_DIR_NAME = "images";
     private static final String PREFS_NAME = "CONVERSATION_PREFS";
     private static final String DEVICE_UUID = "DEVICE_UUID";
+    private static final String DEVICE_REGISTERED = "DEVICE_REGISTERED";
 
     private static ConversationManager sInstance;
     private Context mContext;
@@ -52,8 +53,14 @@ public class ConversationManager {
             editor.putString(DEVICE_UUID, UUID.randomUUID().toString());
             editor.apply();
         }
+
         mDeviceUUID = UUID.fromString(settings.getString(DEVICE_UUID, null));
-        Log.i(TAG, "Device UUID: " + mDeviceUUID.toString());
+        Log.i(TAG, "Device has UUID: " + mDeviceUUID.toString());
+        if (!getDeviceRegistered()) {
+            registerDevice();
+        } else {
+            Log.d(TAG, "Device has been registered.");
+        }
     }
 
     public static ConversationManager getInstance(Context context) {
@@ -69,6 +76,11 @@ public class ConversationManager {
         values.put(ConversationTable.Cols.DATE, c.getDate().getTime());
         values.put(ConversationTable.Cols.UPLOADED, c.isUploaded());
         return values;
+    }
+
+    public boolean getDeviceRegistered() {
+        SharedPreferences settings = mContext.getSharedPreferences(PREFS_NAME, 0);
+        return settings.getBoolean(DEVICE_REGISTERED, false);
     }
 
     public void addConversation(Conversation c) {
@@ -124,11 +136,63 @@ public class ConversationManager {
         return mContext.getFilesDir().toPath().resolve(IMAGE_DIR_NAME);
     }
 
+    private void registerDevice() {
+        Log.i(TAG, "Attempting to register device with UUID " + mDeviceUUID.toString());
+        SharedPreferences settings = mContext.getSharedPreferences(PREFS_NAME, 0);
+        if (getDeviceRegistered()) {
+            Log.d(TAG, "Skipping registration of registered device");
+            return;
+        }
+
+        String deviceURL = String.format("/devices/%s/", mDeviceUUID);
+        // mark device registered if can retrieve it or if successfully registered
+        ConversationAPIClient.get(deviceURL, null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.i(TAG, "Device already registered in server.");
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean(DEVICE_REGISTERED, true);
+                editor.apply();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if (statusCode != 404) {
+                    Log.i(TAG, "Device registration status return statuscode " + statusCode);
+                    return;
+                }
+                RequestParams params = new RequestParams();
+                params.put("uuid", mDeviceUUID.toString());
+                ConversationAPIClient.post("/devices/", params, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.i(TAG, "Device registration successful");
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putBoolean(DEVICE_REGISTERED, true);
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        Log.i(TAG, "Failed to register device with status code " + statusCode);
+                    }
+
+
+                }, true);
+            }
+        }, true);
+
+
+    }
+
     // returns true if conversation has been successfully uploaded, either now, or in the past
     private boolean uploadConversation(final Conversation conversation) {
         Log.i(TAG, "uploadConversation");
         if (conversation.isUploaded()) {
             return true;
+        }
+        if (!getDeviceRegistered()) {
+            registerDevice();
         }
 
         // set params
@@ -171,6 +235,7 @@ public class ConversationManager {
 
         return conversation.isUploaded();
     }
+
 
     public static class UploadTask extends AsyncTask<Conversation, Void, Boolean> {
 
