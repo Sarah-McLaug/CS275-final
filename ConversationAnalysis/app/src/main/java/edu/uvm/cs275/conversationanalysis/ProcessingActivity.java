@@ -154,6 +154,9 @@ public class ProcessingActivity extends AppCompatActivity {
             return false;
         }
 
+        inFile.delete();
+        audioInputFile.delete();
+
         return outFile.exists();
     }
 
