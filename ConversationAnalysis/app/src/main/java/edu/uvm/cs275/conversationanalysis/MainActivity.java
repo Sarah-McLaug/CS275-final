@@ -9,9 +9,12 @@ import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton mStopButton;
     private MediaRecorder mRecorder = new MediaRecorder();
     private Handler mRecordHandler;
+
+    TextView timerText;
+    long startTime;
+    long countUp;
 
     private ConversationManager mConversationManager;
 
@@ -144,11 +151,27 @@ public class MainActivity extends AppCompatActivity {
         // start recording
         mRecorder.start();
 
-        // after 15 sec. do run() command which stops recording
+        // create chronometer for timer
+        Chronometer stopWatch = (Chronometer) findViewById(R.id.chrono);
+        startTime = SystemClock.elapsedRealtime();
+
+        timerText = (TextView) findViewById(R.id.timer_text);
+        stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer arg0) {
+                countUp = (SystemClock.elapsedRealtime() - arg0.getBase()) / 1000;
+                String text = (countUp / 60) + ":" + (countUp % 60);
+                timerText.setText(text);
+            }
+        });
+        stopWatch.start();
+
+        // after 15 sec. run handler which stops recording
         mRecordHandler = new Handler();
         mRecordHandler.postDelayed(() -> {
             mRecordButton.setEnabled(false);
             mStopButton.setEnabled(false);
+            stopWatch.stop();
             stopRecording();
             completeRecording();
         }, RECORDING_DURATION);

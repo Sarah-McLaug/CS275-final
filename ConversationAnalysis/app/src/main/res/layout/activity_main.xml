@@ -8,64 +8,84 @@
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="608dp"
+        android:layout_height="match_parent"
         tools:context=".MainActivity">
 
         <ImageView
             android:id="@+id/logo"
             android:layout_width="400dp"
             android:layout_height="100dp"
-            android:layout_marginBottom="80dp"
+            android:layout_marginTop="50dp"
             android:src="@drawable/logo"
-            app:layout_constraintBottom_toTopOf="@+id/record_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.454"
+            app:layout_constraintHorizontal_bias="0.571"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/record_button"
             android:layout_width="250dp"
             android:layout_height="250dp"
+            android:layout_marginTop="150dp"
             android:background="@drawable/roundcorner"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_action_name"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.498" />
+            app:layout_constraintTop_toBottomOf="@+id/logo" />
 
         <ImageButton
             android:id="@+id/stop_button"
             android:layout_width="250dp"
             android:layout_height="250dp"
+            android:layout_marginTop="150dp"
             android:background="@drawable/roundcorner"
             android:scaleType="fitCenter"
             android:src="@drawable/stop_icon"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.498" />
+            app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+        <TextView
+            android:id="@+id/timer_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/record_button" />
+
+        <Chronometer
+            android:id="@+id/chrono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="393dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/microphone_background"
+            app:itemIconTint="@color/design_default_color_on_secondary"
+            app:itemTextColor="@color/design_default_color_on_secondary"
+            app:labelVisibilityMode="unlabeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/nav_menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/microphone_background"
-        app:itemIconTint="@color/design_default_color_on_secondary"
-        app:itemTextColor="@color/design_default_color_on_secondary"
-        app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/nav_menu" />
     <!-- END: contents of activity -->
 
 </LinearLayout>
