@@ -53,20 +53,20 @@
                 app:layout_constraintVertical_bias="0.625" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
-            android:id="@+id/record_button"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:background="@drawable/roundcorner"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_action_name"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.498" />
+            <ImageButton
+                android:id="@+id/record_button"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:background="@drawable/roundcorner"
+                android:visibility="visible"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_action_name"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.498" />
 
             <ImageButton
                 android:id="@+id/stop_button"
@@ -95,21 +95,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/record_button"
             app:layout_constraintVertical_bias="0.23" />
-
-        <Chronometer
-            android:id="@+id/chrono"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/timer_text"
-            android:layout_width="118dp"
-            android:layout_height="11dp"
-            android:layout_marginTop="23dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- END: contents of activity -->
