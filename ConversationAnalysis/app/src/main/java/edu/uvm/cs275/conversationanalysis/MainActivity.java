@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         });
         stopWatch.start();
 
-        // after 15 sec. run handler which stops recording
+        // after 15 sec run handler command which stops recording
         mRecordHandler = new Handler();
         mRecordHandler.postDelayed(() -> {
             mRecordButton.setEnabled(false);
