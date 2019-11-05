@@ -186,7 +186,7 @@ public class ConversationManager {
     }
 
     // returns true if conversation has been successfully uploaded, either now, or in the past
-    private boolean uploadConversation(final Conversation conversation) {
+    public boolean uploadConversation(final Conversation conversation) {
         Log.i(TAG, "uploadConversation");
         if (conversation.isUploaded()) {
             return true;
@@ -250,8 +250,6 @@ public class ConversationManager {
 
         @Override
         protected Boolean doInBackground(Conversation... conversations) {
-            System.out.println(conversations.length);
-            System.out.println(conversations.length != 1);
             if (conversations.length != 1) {
                 return false;
             }
