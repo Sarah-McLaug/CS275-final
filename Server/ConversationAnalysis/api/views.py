@@ -4,7 +4,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.serializers import ConversationSerializer
+from api.serializers import ConversationSerializer, DeviceSerializer
 from db.models import Conversation, Device
 
 
@@ -22,3 +22,8 @@ class ConversationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, vi
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+
+
+class DeviceViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer

@@ -5,6 +5,7 @@ from api import views
 
 router = SimpleRouter()
 router.register(r'conversations', views.ConversationViewSet)
+router.register(r'devices', views.DeviceViewSet)
 
 urlpatterns = [
     path('test', views.ConversationViewSet.as_view(actions={'get': 'list'})),
