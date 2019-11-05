@@ -21,12 +21,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -36,11 +38,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int RESULT_FAILURE = 2;
     private static final String RESULT_INTENT_UUID = "edu.uvm.cs275.conversationanalysis.conversation_uuid";
 
-    private DrawerLayout mNavDrawer;
+    private BottomNavigationView mNavMenu;
     private ImageButton mRecordButton;
     private ImageButton mStopButton;
-    private Button mMenuButton;
-    private TextView mContactInfo;
     private MediaRecorder mRecorder = new MediaRecorder();
     private Handler mRecordHandler;
 
@@ -55,10 +55,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
-        mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_record);
+        mNavMenu = findViewById(R.id.bottom_navigation);
+        BottomNavigationItemView navigationView = findViewById(R.id.nav_view);
 
         buttonPress();
     }
@@ -68,17 +66,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         mRecordButton.setEnabled(true);
         mStopButton.setEnabled(true);
-    }
-
-    /* Override the back button if the navigation drawer is open. If it is open, we want the back
-     *  button to close the menu, not the entire activity. */
-    @Override
-    public void onBackPressed() {
-        if (mNavDrawer.isDrawerOpen(GravityCompat.START)) {
-            mNavDrawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     /* Override the permissions request result
@@ -179,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void buttonPress() {
         mRecordButton = findViewById(R.id.record_button);
         mStopButton = findViewById(R.id.stop_button);
-        mContactInfo = findViewById(R.id.contact);
-        mMenuButton = findViewById(R.id.main_menu_button);
 
         // pressing record button
         mRecordButton.setOnClickListener(v -> startRecording());
@@ -190,32 +175,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             stopRecording();
             Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
         });
-
-        // pressing "Contact Us"
-        mContactInfo.setOnClickListener(v -> mContactInfo.setText(R.string.contact_email));
-
-        // pressing the menu button
-        mMenuButton.setOnClickListener(v -> {
-            if (!mNavDrawer.isDrawerOpen(Gravity.LEFT)) {
-                mNavDrawer.openDrawer(Gravity.LEFT);
-            } else {
-                mNavDrawer.closeDrawer(Gravity.RIGHT);
-            }
-        });
-    }
-
-    // This method handles what happens when you click on a nav menu item.
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_view:
-                Intent intent = new Intent(this, ConversationList.class);
-                startActivity(intent);
-                break;
-            case R.id.nav_record:
-                // Do nothing because we're already on this activity.
-                break;
-        }
-        return true;
     }
 }

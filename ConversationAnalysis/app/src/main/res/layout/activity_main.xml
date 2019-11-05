@@ -8,7 +8,7 @@
     <!-- BEGIN: contents of activity. (the nav menu will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="674dp"
+        android:layout_height="608dp"
         tools:context=".MainActivity">
 
         <ImageView
