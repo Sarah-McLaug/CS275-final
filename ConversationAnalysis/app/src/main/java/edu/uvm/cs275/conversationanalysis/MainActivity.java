@@ -45,9 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaRecorder mRecorder = new MediaRecorder();
     private Handler mRecordHandler;
 
-    TextView timerText;
-    long startTime;
-    long countUp;
+    private Chronometer timer;
 
     private ConversationManager mConversationManager;
 
@@ -64,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
         mNavMenu = findViewById(R.id.bottom_navigation);
         BottomNavigationItemView navigationView = findViewById(R.id.nav_view);
+
+        timer = (Chronometer) findViewById(R.id.chronometer);
 
         buttonPress();
     }
@@ -151,27 +151,15 @@ public class MainActivity extends AppCompatActivity {
         // start recording
         mRecorder.start();
 
-        // create chronometer for timer
-        Chronometer stopWatch = (Chronometer) findViewById(R.id.chrono);
-        startTime = SystemClock.elapsedRealtime();
-
-        timerText = (TextView) findViewById(R.id.timer_text);
-        stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer arg0) {
-                countUp = (SystemClock.elapsedRealtime() - arg0.getBase()) / 1000;
-                String text = (countUp / 60) + ":" + (countUp % 60);
-                timerText.setText(text);
-            }
-        });
-        stopWatch.start();
+        // start timer
+        timer.setBase(SystemClock.elapsedRealtime());
+        timer.start();
 
         // after 15 sec run handler command which stops recording
         mRecordHandler = new Handler();
         mRecordHandler.postDelayed(() -> {
             mRecordButton.setEnabled(false);
             mStopButton.setEnabled(false);
-            stopWatch.stop();
             stopRecording();
             completeRecording();
         }, RECORDING_DURATION);
@@ -179,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
+        // stop the timer and reset the base
+        timer.stop();
+        timer.setBase(SystemClock.elapsedRealtime());
+
+        // stop recorder and reset it
         mRecorder.stop();
         mRecorder.reset();
 
