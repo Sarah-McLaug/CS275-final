@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -127,7 +126,7 @@ public class DetailView extends AppCompatActivity implements NavigationView.OnNa
                 startActivity(record_intent);
                 break;
             case R.id.nav_view:
-                Intent view_intent = new Intent(this, ConversationList.class);
+                Intent view_intent = new Intent(this, ConversationListFragment.class);
                 startActivity(view_intent);
                 break;
         }

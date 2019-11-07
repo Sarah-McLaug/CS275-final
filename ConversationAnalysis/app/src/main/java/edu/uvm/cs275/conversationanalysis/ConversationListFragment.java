@@ -7,31 +7,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.fragment.app.Fragment;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConversationList extends AppCompatActivity {
+public class ConversationListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
-    private LayoutInflater mLayoutInflater;
-
-    @Override
-    public void onCreate(Bundle savedInstanceBundle){
-        super.onCreate(savedInstanceBundle);
-    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.conversation_list, container, false);
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
 
@@ -39,11 +33,8 @@ public class ConversationList extends AppCompatActivity {
     }
 
     private void updateUI() {
-        List<Conversation> conversations = new ArrayList<>();
-        for(int i = 0; i < 20; i++){
-            Conversation c = new Conversation();
-            conversations.add(c);
-        }
+        ConversationLab conversationLab = ConversationLab.get(getActivity());
+        List<Conversation> conversations = conversationLab.getConversations();
 
         mAdapter = new ConversationAdapter(conversations);
         mRecyclerView.setAdapter(mAdapter);
@@ -71,7 +62,7 @@ public class ConversationList extends AppCompatActivity {
         @Override
         public void onClick(View view){
             //TODO: implement going to a detail view
-            Toast.makeText(getApplicationContext(),
+            Toast.makeText(getActivity(),
                     mConversation.getDate() + " clicked!", Toast.LENGTH_SHORT)
                     .show();
         }
@@ -86,7 +77,7 @@ public class ConversationList extends AppCompatActivity {
 
         @Override
         public ConversationHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
             return new ConversationHolder(layoutInflater, parent);
         }

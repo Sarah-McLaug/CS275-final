@@ -30,7 +30,7 @@
             android:name=".ProcessingActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".DetailView" />
-        <activity android:name=".ConversationList"></activity>
+        <activity android:name=".ConversationListActivity"></activity>
 
         <service
             android:name=".service.BackgroundUploadService"
