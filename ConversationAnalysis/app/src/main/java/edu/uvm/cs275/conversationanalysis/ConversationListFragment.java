@@ -1,5 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,10 +62,8 @@ public class ConversationListFragment extends Fragment {
 
         @Override
         public void onClick(View view){
-            //TODO: implement going to a detail view
-            Toast.makeText(getActivity(),
-                    mConversation.getDate() + " clicked!", Toast.LENGTH_SHORT)
-                    .show();
+            Intent intent = DetailView.newIntent(getActivity(), mConversation);
+            startActivity(intent);
         }
     }
 
