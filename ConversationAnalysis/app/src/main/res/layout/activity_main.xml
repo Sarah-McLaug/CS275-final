@@ -28,29 +28,29 @@
             android:id="@+id/record_button"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:layout_marginTop="150dp"
+            android:layout_marginBottom="200dp"
             android:background="@drawable/roundcorner"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_action_name"
             android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logo" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
             android:id="@+id/stop_button"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:layout_marginTop="150dp"
+            android:layout_marginBottom="200dp"
             android:background="@drawable/roundcorner"
             android:scaleType="fitCenter"
             android:src="@drawable/stop_icon"
             android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logo" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Chronometer
             android:id="@+id/chronometer"
