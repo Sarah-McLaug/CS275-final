@@ -1,16 +1,18 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,15 +20,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import edu.uvm.cs275.conversationanalysis.service.BackgroundUploadReceiver;
+
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -36,13 +39,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int RESULT_FAILURE = 2;
     private static final String RESULT_INTENT_UUID = "edu.uvm.cs275.conversationanalysis.conversation_uuid";
 
-    private DrawerLayout mNavDrawer;
+    private BottomNavigationView mNavMenu;
     private ImageButton mRecordButton;
     private ImageButton mStopButton;
-    private Button mMenuButton;
-    private TextView mContactInfo;
     private MediaRecorder mRecorder = new MediaRecorder();
     private Handler mRecordHandler;
+
+    private Chronometer timer;
 
     private ConversationManager mConversationManager;
 
@@ -55,10 +58,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
-        mNavDrawer = findViewById(R.id.drawer_layout); // grab the navigation drawer
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_record);
+        scheduleAlarm();
+
+        mNavMenu = findViewById(R.id.bottom_navigation);
+        BottomNavigationItemView navigationView = findViewById(R.id.nav_view);
+
+        timer = (Chronometer) findViewById(R.id.chronometer);
 
         buttonPress();
     }
@@ -70,15 +75,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mStopButton.setEnabled(true);
     }
 
-    /* Override the back button if the navigation drawer is open. If it is open, we want the back
-     *  button to close the menu, not the entire activity. */
-    @Override
-    public void onBackPressed() {
-        if (mNavDrawer.isDrawerOpen(GravityCompat.START)) {
-            mNavDrawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+    public void scheduleAlarm() {
+        Intent intent = new Intent(getApplicationContext(), BackgroundUploadReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, BackgroundUploadReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long firstMillis = System.currentTimeMillis();
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // execute background service now, then roughly ever hour
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis, AlarmManager.INTERVAL_HOUR, pIntent);
     }
 
     /* Override the permissions request result
@@ -146,7 +151,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // start recording
         mRecorder.start();
 
-        // after 15 sec. do run() command which stops recording
+        // start timer
+        timer.setBase(SystemClock.elapsedRealtime());
+        timer.start();
+
+        // after 15 sec run handler command which stops recording
         mRecordHandler = new Handler();
         mRecordHandler.postDelayed(() -> {
             mRecordButton.setEnabled(false);
@@ -158,9 +167,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
+        // stop the timer and reset the base
+        timer.stop();
+        timer.setBase(SystemClock.elapsedRealtime());
+
+        // stop recorder and reset it
         mRecorder.stop();
         mRecorder.reset();
-        mRecorder.release();
+
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
         // cancel the timer
@@ -179,8 +193,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void buttonPress() {
         mRecordButton = findViewById(R.id.record_button);
         mStopButton = findViewById(R.id.stop_button);
-        mContactInfo = findViewById(R.id.contact);
-        mMenuButton = findViewById(R.id.main_menu_button);
 
         // pressing record button
         mRecordButton.setOnClickListener(v -> startRecording());
@@ -190,32 +202,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             stopRecording();
             Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
         });
-
-        // pressing "Contact Us"
-        mContactInfo.setOnClickListener(v -> mContactInfo.setText(R.string.contact_email));
-
-        // pressing the menu button
-        mMenuButton.setOnClickListener(v -> {
-            if (!mNavDrawer.isDrawerOpen(Gravity.LEFT)) {
-                mNavDrawer.openDrawer(Gravity.LEFT);
-            } else {
-                mNavDrawer.closeDrawer(Gravity.RIGHT);
-            }
-        });
-    }
-
-    // This method handles what happens when you click on a nav menu item.
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_view:
-                Intent intent = new Intent(this, ConversationList.class);
-                startActivity(intent);
-                break;
-            case R.id.nav_record:
-                // Do nothing because we're already on this activity.
-                break;
-        }
-        return true;
     }
 }
