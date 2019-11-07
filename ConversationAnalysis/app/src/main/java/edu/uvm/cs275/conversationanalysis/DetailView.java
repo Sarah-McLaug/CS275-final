@@ -99,11 +99,12 @@ public class DetailView extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch ((item.getItemId())){
                         case R.id.nav_record:
-                            // do nothing because we're already on that activity.
+                            Intent mainIntent = new Intent(DetailView.this, MainActivity.class);
+                            startActivity(mainIntent);
                             break;
                         case R.id.nav_view:
-                            Intent intent = new Intent(DetailView.this, ConversationListActivity.class);
-                            startActivity(intent);
+                            Intent listIntent = new Intent(DetailView.this, ConversationListActivity.class);
+                            startActivity(listIntent);
                             break;
                     }
                     return true;
