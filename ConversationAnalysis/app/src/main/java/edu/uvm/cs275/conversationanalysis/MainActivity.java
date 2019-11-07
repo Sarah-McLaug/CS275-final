@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
@@ -21,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         scheduleAlarm();
 
         mNavMenu = findViewById(R.id.bottom_navigation);
-        BottomNavigationItemView navigationView = findViewById(R.id.nav_view);
+        mNavMenu.setOnNavigationItemSelectedListener(navListener);
 
         timer = (Chronometer) findViewById(R.id.chronometer);
 
@@ -203,4 +203,21 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
         });
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch ((item.getItemId())){
+                        case R.id.nav_record:
+                            // do nothing because we're already on that activity.
+                            break;
+                        case R.id.nav_view:
+                            Intent intent = new Intent(MainActivity.this, ConversationListActivity.class);
+                            startActivity(intent);
+                            break;
+                    }
+                    return true;
+                }
+            };
 }
