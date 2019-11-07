@@ -8,4 +8,5 @@ public class ConversationListActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         return new ConversationListFragment();
     }
+
 }
