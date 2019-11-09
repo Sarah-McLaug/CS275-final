@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
@@ -25,10 +24,12 @@ import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.UUID;
 
 import edu.uvm.cs275.conversationanalysis.service.BackgroundUploadReceiver;
@@ -37,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static final int RECORDING_DURATION = 15000;
-    private static final int SAMPLE_RATE = 44100;
+    private static final long RECORDING_DURATION = 30000;
+    private static final int SAMPLE_RATE = 44100 * 2;
 
     private static final int PROCESSING_RESULT = 1;
     public static final int RESULT_FAILURE = 2;
@@ -47,9 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mNavMenu;
     private ImageButton mRecordButton;
     private ImageButton mStopButton;
-    private boolean mRecordingActive = false;
     private AudioRecord mRecorder;
     private Handler mRecordHandler;
+    private boolean mRecordingActive = false;
+    private long mRecorderShortsRead;
 
     private Chronometer timer;
 
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         mNavMenu.setOnNavigationItemSelectedListener(navListener);
 
         timer = (Chronometer) findViewById(R.id.chronometer);
+        timer.setBase(SystemClock.elapsedRealtime());
 
         buttonPress();
     }
@@ -116,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        timer.setBase(SystemClock.elapsedRealtime());
         if (requestCode == PROCESSING_RESULT) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(getApplicationContext(), R.string.successful, Toast.LENGTH_SHORT).show();
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 bufferSize = SAMPLE_RATE * 2;
             }
 
-            short[] audioBuffer = new short[bufferSize / 2];
+            short[] audioBuffer = new short[bufferSize / 4];
 
             mRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT,
                     SAMPLE_RATE,
@@ -171,10 +175,11 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // create file
-            OutputStream os;
+            // create file and buffered outstream
+            File outFile = ProcessingActivity.getRawAudioFile(getApplicationContext());
+            DataOutputStream os = null;
             try {
-                os = new FileOutputStream(ProcessingActivity.getRawAudioFile(getApplicationContext()).toString());
+                os = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile)));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return;
@@ -188,52 +193,43 @@ public class MainActivity extends AppCompatActivity {
 
             // after 15 sec run handler which stops recording
             mRecordHandler.postDelayed(() -> {
-                mRecordButton.setEnabled(false);
-                mStopButton.setEnabled(false);
                 stopRecording();
                 completeRecording();
             }, RECORDING_DURATION);
 
-            long shortsRead = 0;
+            mRecorderShortsRead = 0;
             mRecordingActive = true;
             mRecorder.startRecording();
             while (mRecordingActive) {
-                int numberOfShort = mRecorder.read(audioBuffer, 0, audioBuffer.length);
-                shortsRead += numberOfShort;
                 try {
-                    os.write(short2byte(audioBuffer), 0, audioBuffer.length);
+                    int bufferReadResult = mRecorder.read(audioBuffer, 0, audioBuffer.length);
+                    mRecorderShortsRead += bufferReadResult;
+                    for (int i = 0; i < bufferReadResult; i++) {
+                        os.writeShort(audioBuffer[i]);
+                    }
+                    // Do something with the audioBuffer
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // Do something with the audioBuffer
             }
 
             // release
             mRecorder.stop();
             mRecorder.release();
             // close file
+
             try {
                 os.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            Log.v(LOG_TAG, String.format("Recording stopped. Samples read: %d", shortsRead));
+            Log.v(LOG_TAG, String.format("Recording stopped. Samples read: %d", mRecorderShortsRead));
         }).start();
 
     }
 
-    private byte[] short2byte(short[] sData) {
-        int shortArrsize = sData.length;
-        byte[] bytes = new byte[shortArrsize * 2];
-        for (int i = 0; i < shortArrsize; i++) {
-            bytes[i * 2] = (byte) (sData[i] & 0x00FF);
-            bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
-            sData[i] = 0;
-        }
-        return bytes;
-
-    }
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
@@ -242,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
 
         // stop the timer and reset the base
         timer.stop();
-        timer.setBase(SystemClock.elapsedRealtime());
 
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
@@ -254,7 +249,9 @@ public class MainActivity extends AppCompatActivity {
 
     // transitions to processing activity after successful recording
     private void completeRecording() {
-        Intent intent = new Intent(MainActivity.this, ProcessingActivity.class);
+        mRecordButton.setEnabled(false);
+        mStopButton.setEnabled(false);
+        Intent intent = ProcessingActivity.newIntent(MainActivity.this, 1000 * mRecorderShortsRead / SAMPLE_RATE);
         startActivityForResult(intent, PROCESSING_RESULT);
     }
 
@@ -269,24 +266,25 @@ public class MainActivity extends AppCompatActivity {
         // pressing the stop button
         mStopButton.setOnClickListener(v -> {
             stopRecording();
-            Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
+            if (SystemClock.elapsedRealtime() - timer.getBase() < ConversationManager.CONVERSATION_LENGTH) {
+                Toast.makeText(MainActivity.this, R.string.error_recording, Toast.LENGTH_SHORT).show();
+            } else {
+                completeRecording();
+            }
+            timer.setBase(SystemClock.elapsedRealtime());
         });
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch ((item.getItemId())){
-                        case R.id.nav_record:
-                            // do nothing because we're already on that activity.
-                            break;
-                        case R.id.nav_view:
-                            Intent intent = new Intent(MainActivity.this, ConversationListActivity.class);
-                            startActivity(intent);
-                            break;
-                    }
-                    return true;
-                }
-            };
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+        switch ((item.getItemId())) {
+            case R.id.nav_record:
+                // do nothing because we're already on that activity.
+                break;
+            case R.id.nav_view:
+                Intent intent = new Intent(MainActivity.this, ConversationListActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
+    };
 }

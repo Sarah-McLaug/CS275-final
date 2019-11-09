@@ -32,6 +32,8 @@ import edu.uvm.cs275.conversationanalysis.db.ConversationSchema.ConversationTabl
 
 public class ConversationManager {
     public static final String IMAGE_EXT = ".png";
+    public static final long CONVERSATION_LENGTH = 15000;
+
     private static final String TAG = "ConversationManager";
     private static final String IMAGE_DIR_NAME = "images";
     private static final String PREFS_NAME = "CONVERSATION_PREFS";

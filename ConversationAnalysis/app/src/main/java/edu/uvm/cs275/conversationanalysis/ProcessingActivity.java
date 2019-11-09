@@ -20,6 +20,8 @@ import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 public class ProcessingActivity extends AppCompatActivity {
 
@@ -27,7 +29,10 @@ public class ProcessingActivity extends AppCompatActivity {
     public static final String RAW_AUDIO_FILE_NAME = "audio.pcm";
     private static final String TAG = "ProcessingActivity";
 
+    private static final String EXTRA_DURATION = "duration";
+
     private Conversation mConversation;
+    private long mDuration;
     private ImageView mGammatoneView;
     private Button mSendButton;
     private Button mCancelButton;
@@ -61,6 +66,8 @@ public class ProcessingActivity extends AppCompatActivity {
         });
 
         mConversation = new Conversation();
+
+        mDuration = getIntent().getLongExtra(EXTRA_DURATION, 0);
 
         new ProcessAudioTask(this).execute();
     }
@@ -118,7 +125,21 @@ public class ProcessingActivity extends AppCompatActivity {
 
     protected boolean processAudio() {
         File audioInputFile = getRawAudioFile(getApplicationContext());
-        FFmpeg.execute(String.format("-f s16le -ar 44.1k -ac 2 -i %s -y %s", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
+
+        // start time is random between 0 and max time where length is still correct
+        long start = ThreadLocalRandom.current().nextLong(mDuration - ConversationManager.CONVERSATION_LENGTH);
+
+        // convert to wav and trim audio
+        String cmd = String.format(
+                "-f s16le -ar 44.1k -ac 2 -ss '%s' -t '%s' -i %s -y %s",
+                formatDuration(start),
+                formatDuration(ConversationManager.CONVERSATION_LENGTH),
+                audioInputFile.toString(),
+                getAudioFile(getApplicationContext()).toString()
+        );
+
+        Log.d(TAG, "running: " + cmd);
+        FFmpeg.execute(cmd);
         int rc = FFmpeg.getLastReturnCode();
         if (rc == FFmpeg.RETURN_CODE_SUCCESS) {
             Log.i(TAG, "Command execution completed successfully.");
@@ -167,5 +188,17 @@ public class ProcessingActivity extends AppCompatActivity {
 
     public static File getRawAudioFile(Context context) {
         return context.getFilesDir().toPath().resolve(RAW_AUDIO_FILE_NAME).toFile();
+    }
+
+    public static Intent newIntent(Context context, long duration) {
+        Intent intent = new Intent(context, ProcessingActivity.class);
+        intent.putExtra(EXTRA_DURATION, duration);
+        return intent;
+    }
+
+    public static String formatDuration(long millis) {
+        return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
     }
 }
