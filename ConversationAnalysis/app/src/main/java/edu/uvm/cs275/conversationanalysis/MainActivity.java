@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +25,10 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import edu.uvm.cs275.conversationanalysis.service.BackgroundUploadReceiver;
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "Audio Recording";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final int RECORDING_DURATION = 15000;
+    private static final int SAMPLE_RATE = 44100;
 
     private static final int PROCESSING_RESULT = 1;
     public static final int RESULT_FAILURE = 2;
@@ -42,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mNavMenu;
     private ImageButton mRecordButton;
     private ImageButton mStopButton;
-    private MediaRecorder mRecorder = new MediaRecorder();
+    private boolean mRecordingActive = false;
+    private AudioRecord mRecorder;
     private Handler mRecordHandler;
 
     private Chronometer timer;
@@ -137,43 +143,106 @@ public class MainActivity extends AppCompatActivity {
         mRecordButton.setVisibility(View.INVISIBLE);
         mStopButton.setVisibility(View.VISIBLE);
 
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mRecorder.setOutputFile(ProcessingActivity.getRawAudioFile(getApplicationContext()));
-
-        try {
-            mRecorder.prepare();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
-        }
-
-        // start recording
-        mRecorder.start();
-
-        // start timer
-        timer.setBase(SystemClock.elapsedRealtime());
-        timer.start();
-
-        // after 15 sec run handler command which stops recording
+        // must declare handler from UI thread
         mRecordHandler = new Handler();
-        mRecordHandler.postDelayed(() -> {
-            mRecordButton.setEnabled(false);
-            mStopButton.setEnabled(false);
-            stopRecording();
-            completeRecording();
-        }, RECORDING_DURATION);
+        // new thread to handle audio recording on
+        new Thread(() -> {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+
+            // buffer size in bytes
+            int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT);
+
+            if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
+                bufferSize = SAMPLE_RATE * 2;
+            }
+
+            short[] audioBuffer = new short[bufferSize / 2];
+
+            mRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    bufferSize);
+
+            if (mRecorder.getState() != AudioRecord.STATE_INITIALIZED) {
+                Log.e(LOG_TAG, "Audio Record can't initialize!");
+                return;
+            }
+
+            // create file
+            OutputStream os;
+            try {
+                os = new FileOutputStream(ProcessingActivity.getRawAudioFile(getApplicationContext()).toString());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            // start timer
+            runOnUiThread(() -> {
+                timer.setBase(SystemClock.elapsedRealtime());
+                timer.start();
+            });
+
+            // after 15 sec run handler which stops recording
+            mRecordHandler.postDelayed(() -> {
+                mRecordButton.setEnabled(false);
+                mStopButton.setEnabled(false);
+                stopRecording();
+                completeRecording();
+            }, RECORDING_DURATION);
+
+            long shortsRead = 0;
+            mRecordingActive = true;
+            mRecorder.startRecording();
+            while (mRecordingActive) {
+                int numberOfShort = mRecorder.read(audioBuffer, 0, audioBuffer.length);
+                shortsRead += numberOfShort;
+                try {
+                    os.write(short2byte(audioBuffer), 0, audioBuffer.length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Do something with the audioBuffer
+            }
+
+            // release
+            mRecorder.stop();
+            mRecorder.release();
+            // close file
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Log.v(LOG_TAG, String.format("Recording stopped. Samples read: %d", shortsRead));
+        }).start();
+
+    }
+
+    private byte[] short2byte(short[] sData) {
+        int shortArrsize = sData.length;
+        byte[] bytes = new byte[shortArrsize * 2];
+        for (int i = 0; i < shortArrsize; i++) {
+            bytes[i * 2] = (byte) (sData[i] & 0x00FF);
+            bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
+            sData[i] = 0;
+        }
+        return bytes;
+
     }
 
     // stops audio if user decides to end recording early
     private void stopRecording() {
+        // indicate that we want the timer to stop
+        mRecordingActive = false;
+
         // stop the timer and reset the base
         timer.stop();
         timer.setBase(SystemClock.elapsedRealtime());
-
-        // stop recorder and reset it
-        mRecorder.stop();
-        mRecorder.reset();
 
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);

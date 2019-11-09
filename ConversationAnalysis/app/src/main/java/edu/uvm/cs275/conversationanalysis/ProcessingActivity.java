@@ -24,7 +24,7 @@ import java.nio.file.Path;
 public class ProcessingActivity extends AppCompatActivity {
 
     public static final String AUDIO_FILE_NAME = "audio.wav";
-    public static final String RAW_AUDIO_FILE_NAME = "audio.aac";
+    public static final String RAW_AUDIO_FILE_NAME = "audio.pcm";
     private static final String TAG = "ProcessingActivity";
 
     private Conversation mConversation;
@@ -118,7 +118,7 @@ public class ProcessingActivity extends AppCompatActivity {
 
     protected boolean processAudio() {
         File audioInputFile = getRawAudioFile(getApplicationContext());
-        FFmpeg.execute(String.format("-i %s -ac 2 -y %s", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
+        FFmpeg.execute(String.format("-f s16le -ar 44.1k -ac 2 -i %s -y %s", audioInputFile.toString(), getAudioFile(getApplicationContext()).toString()));
         int rc = FFmpeg.getLastReturnCode();
         if (rc == FFmpeg.RETURN_CODE_SUCCESS) {
             Log.i(TAG, "Command execution completed successfully.");
