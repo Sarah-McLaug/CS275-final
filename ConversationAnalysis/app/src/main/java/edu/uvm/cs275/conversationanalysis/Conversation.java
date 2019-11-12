@@ -11,15 +11,17 @@ public class Conversation {
     private UUID mUUID;
     private Date mDate;
     private boolean mUploaded;
+    private String mStartTime;
 
-    public Conversation(UUID uuid, Date date, boolean uploaded) {
+    public Conversation(UUID uuid, Date date, boolean uploaded, String startTime) {
         this.mUUID = uuid;
         this.mDate = date;
         this.mUploaded = false;
+        this.mStartTime = startTime;
     }
 
     public Conversation() {
-        this(UUID.randomUUID(), new Date(), false);
+        this(UUID.randomUUID(), new Date(), false, "00:00:00");
     }
 
     public UUID getUUID() {
@@ -48,5 +50,13 @@ public class Conversation {
 
     public Path getImageFile(Context context) {
         return ConversationManager.getInstance(context).getImageDir().resolve(this.mUUID.toString() + ConversationManager.IMAGE_EXT);
+    }
+
+    public String getStartTime() {
+        return mStartTime;
+    }
+
+    public void setStartTime(String startTime) {
+        mStartTime = startTime;
     }
 }
