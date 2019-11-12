@@ -78,6 +78,7 @@ public class ProcessingActivity extends AppCompatActivity {
         public ProcessAudioTask(ProcessingActivity activity) {
             dialog = new ProgressDialog(activity);
             dialog.show();
+            dialog.setCancelable(false);
         }
 
         @Override
