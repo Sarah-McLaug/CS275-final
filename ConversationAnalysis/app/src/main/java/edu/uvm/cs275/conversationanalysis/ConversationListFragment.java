@@ -7,13 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.fragment.app.Fragment;
 
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
@@ -21,6 +19,7 @@ public class ConversationListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.conversation_list, container, false);
@@ -52,7 +51,7 @@ public class ConversationListFragment extends Fragment {
             itemView.setOnClickListener(this);
 
             mDateTextView = (TextView) itemView.findViewById(R.id.conversation_date);
-            //mImageView = (ImageView) itemView.findViewById(R.id.gammatone);
+            mImageView = (ImageView) itemView.findViewById(R.id.gammatone);
         }
 
         public void bind(Conversation c) {
