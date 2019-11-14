@@ -42,7 +42,7 @@ public class ConversationListFragment extends Fragment {
     }
 
     private void updateUI() {
-        ConversationLab conversationLab = ConversationLab.get(getActivity());
+        ConversationManager conversationLab = ConversationManager.getInstance(getActivity());
         List<Conversation> conversations = conversationLab.getConversations();
 
         mAdapter = new ConversationAdapter(conversations);

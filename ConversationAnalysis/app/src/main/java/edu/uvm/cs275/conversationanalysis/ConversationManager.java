@@ -77,6 +77,7 @@ public class ConversationManager {
         values.put(ConversationTable.Cols.UUID, c.getUUID().toString());
         values.put(ConversationTable.Cols.DATE, c.getDate().getTime());
         values.put(ConversationTable.Cols.UPLOADED, c.isUploaded());
+        values.put(ConversationTable.Cols.START_TIME, c.getStartTime());
         return values;
     }
 

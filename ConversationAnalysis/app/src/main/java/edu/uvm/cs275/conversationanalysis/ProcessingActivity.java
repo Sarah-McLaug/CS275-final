@@ -78,6 +78,7 @@ public class ProcessingActivity extends AppCompatActivity {
         public ProcessAudioTask(ProcessingActivity activity) {
             dialog = new ProgressDialog(activity);
             dialog.show();
+            dialog.setCancelable(false);
         }
 
         @Override
@@ -137,6 +138,7 @@ public class ProcessingActivity extends AppCompatActivity {
                 audioInputFile.toString(),
                 getAudioFile(getApplicationContext()).toString()
         );
+        mConversation.setStartTime(formatDuration(start));
 
         Log.d(TAG, "running: " + cmd);
         FFmpeg.execute(cmd);
