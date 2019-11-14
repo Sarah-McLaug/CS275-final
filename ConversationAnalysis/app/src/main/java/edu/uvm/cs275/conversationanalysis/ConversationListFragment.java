@@ -1,6 +1,8 @@
 package edu.uvm.cs275.conversationanalysis;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
@@ -66,6 +70,12 @@ public class ConversationListFragment extends Fragment {
         public void bind(Conversation c) {
             mConversation = c;
             mDateTextView.setText(mConversation.getDate().toString()); //TODO: Format date in a normal way
+
+            Path imagePath = mConversation.getImageFile(getContext());
+            File image = imagePath.toFile();
+
+            Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
+            mImageView.setImageBitmap(bmp);
         }
 
         @Override
