@@ -36,6 +36,7 @@ public class DetailView extends AppCompatActivity {
     private TextView mUUID;
 
     private Conversation mConversation;
+    private ConversationManager cm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class DetailView extends AppCompatActivity {
         }
         String UUID_string = "ID: " + gammatoneID;
 
-        ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
+        cm = ConversationManager.getInstance(getApplicationContext());
         mConversation = cm.getConversation(gammatoneID);
         Path imagePath = mConversation.getImageFile(getApplicationContext());
         File image = imagePath.toFile();
@@ -108,7 +109,9 @@ public class DetailView extends AppCompatActivity {
                             break;
                         case R.id.delete_button:
                             // delete the entry and return to the previous screen.
-                            finish();
+                            cm.deleteConversation(mConversation);
+                            Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
+                            startActivity(listIntentRefresh);
                             break;
                     }
                     return true;
