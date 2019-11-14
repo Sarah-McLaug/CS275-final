@@ -108,7 +108,7 @@ public class DetailView extends AppCompatActivity {
                             startActivity(listIntent);
                             break;
                         case R.id.delete_button:
-                            // delete the entry and return to the previous screen.
+                            // delete the entry and open a new recycler view.
                             cm.deleteConversation(mConversation);
                             Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
                             startActivity(listIntentRefresh);
