@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,12 +13,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
+    private BottomNavigationView mNavMenu;
+    private ImageButton mRecordButton;
+    private ImageButton mStopButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,6 +32,9 @@ public class ConversationListFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mNavMenu = v.findViewById(R.id.bottom_navigation);
+        mNavMenu.setOnNavigationItemSelectedListener(navListener);
 
         updateUI();
 
@@ -91,4 +100,18 @@ public class ConversationListFragment extends Fragment {
             return mConversations.size();
         }
     }
+
+    // This method opens the respective activity upon navigation button press.
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+        switch ((item.getItemId())) {
+            case R.id.nav_record:
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.nav_view:
+                // do nothing because we're already on that activity.
+                break;
+        }
+        return true;
+    };
 }

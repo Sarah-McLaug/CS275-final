@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // This method opens the respective activity upon navigation button press.
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
         switch ((item.getItemId())) {
             case R.id.nav_record:
