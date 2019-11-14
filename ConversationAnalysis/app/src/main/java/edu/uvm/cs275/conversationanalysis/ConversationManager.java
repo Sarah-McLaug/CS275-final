@@ -91,6 +91,10 @@ public class ConversationManager {
         mDatabase.insert(ConversationTable.NAME, null, values);
     }
 
+    public void deleteConversation(Conversation c) {
+        mDatabase.delete(ConversationTable.NAME, "UUID=?", new String[] { c.getUUID().toString() });
+    }
+
     public void updateConversation(Conversation c) {
         String uuidString = c.getUUID().toString();
         ContentValues values = getContentValues(c);
