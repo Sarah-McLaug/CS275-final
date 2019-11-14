@@ -106,6 +106,10 @@ public class DetailView extends AppCompatActivity {
                             Intent listIntent = new Intent(DetailView.this, ConversationListActivity.class);
                             startActivity(listIntent);
                             break;
+                        case R.id.delete_button:
+                            // delete the entry and return to the previous screen.
+                            finish();
+                            break;
                     }
                     return true;
                 }
