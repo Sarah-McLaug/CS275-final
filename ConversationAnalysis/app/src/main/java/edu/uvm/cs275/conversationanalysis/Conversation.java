@@ -16,7 +16,7 @@ public class Conversation {
     public Conversation(UUID uuid, Date date, boolean uploaded, String startTime) {
         this.mUUID = uuid;
         this.mDate = date;
-        this.mUploaded = false;
+        this.mUploaded = uploaded;
         this.mStartTime = startTime;
     }
 

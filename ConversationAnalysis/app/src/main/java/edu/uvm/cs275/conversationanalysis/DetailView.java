@@ -6,20 +6,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -43,10 +38,10 @@ public class DetailView extends AppCompatActivity {
         setContentView(R.layout.detail_view);
 
         UUID gammatoneID;
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
         } else {
-            gammatoneID = UUID.fromString( (String) savedInstanceState.getCharSequence(UUID_Index));
+            gammatoneID = UUID.fromString((String) savedInstanceState.getCharSequence(UUID_Index));
         }
         String UUID_string = "ID: " + gammatoneID;
 
@@ -64,10 +59,9 @@ public class DetailView extends AppCompatActivity {
         mUUID.setText(UUID_string);
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
-
         if (!mConversation.isUploaded()) {
             Log.d(TAG, "Uploading conversation...");
-            new ConversationManager.UploadTask(getApplicationContext(), (Boolean result) -> {
+            cm.uploadConversation(mConversation, true, result -> {
                 if (result) {
                     Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
                     Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
@@ -75,7 +69,7 @@ public class DetailView extends AppCompatActivity {
                     Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
                     Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
                 }
-            }).execute(mConversation);
+            });
         }
     }
 
@@ -88,7 +82,7 @@ public class DetailView extends AppCompatActivity {
 
     // This method handles what happens when the screen rotates
     @Override
-    public void onSaveInstanceState(Bundle outState){
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(UUID_Index, mUUID.toString());
     }
@@ -97,7 +91,7 @@ public class DetailView extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch ((item.getItemId())){
+                    switch ((item.getItemId())) {
                         case R.id.nav_record:
                             Intent mainIntent = new Intent(DetailView.this, MainActivity.class);
                             startActivity(mainIntent);

@@ -20,7 +20,7 @@ public class BackgroundUploadService extends IntentService {
         ConversationManager cm = ConversationManager.getInstance(getApplicationContext());
         for (Conversation conversation : cm.getConversations()) {
             if (!conversation.isUploaded()) {
-                cm.uploadConversation(conversation);
+                cm.uploadConversation(conversation, false, null);
             }
         }
     }
