@@ -19,6 +19,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
@@ -48,13 +51,15 @@ public class ConversationListFragment extends Fragment {
     private void updateUI() {
         ConversationManager conversationLab = ConversationManager.getInstance(getActivity());
         List<Conversation> conversations = conversationLab.getConversations();
+        conversations.sort(Comparator.comparing(Conversation::getDate));
+        Collections.reverse(conversations);
 
         mAdapter = new ConversationAdapter(conversations);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     private class ConversationHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener{
+            implements View.OnClickListener {
         private Conversation mConversation;
         private TextView mDateTextView;
         private ImageView mImageView;
@@ -79,7 +84,7 @@ public class ConversationListFragment extends Fragment {
         }
 
         @Override
-        public void onClick(View view){
+        public void onClick(View view) {
             Intent intent = DetailView.newIntent(getActivity(), mConversation);
             startActivity(intent);
         }
