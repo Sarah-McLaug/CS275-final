@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Navigation bar menu items. -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_record"
+            android:checkable="false"
+            android:icon="@drawable/ic_action_name"
+            android:title="@string/nav_record_title" />
+        <item
+            android:id="@+id/nav_view"
+            android:checkable="false"
+            android:icon="@drawable/menu_icon"
+            android:title="@string/nav_view_title" />
+        <item
+            android:id="@+id/delete_button"
+            android:checkable="false"
+            android:icon="@drawable/ic_trashcan_foreground"
+            android:title="@string/delete_button_caption" />
+    </group>
+
+</menu>
