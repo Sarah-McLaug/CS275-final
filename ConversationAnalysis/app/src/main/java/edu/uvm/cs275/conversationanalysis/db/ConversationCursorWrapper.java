@@ -17,7 +17,6 @@ public class ConversationCursorWrapper extends CursorWrapper {
     public Conversation getConversation() {
         String uuidString = getString(getColumnIndex(ConversationSchema.ConversationTable.Cols.UUID));
         long date = getLong(getColumnIndex(ConversationSchema.ConversationTable.Cols.DATE));
-        int test = getInt(getColumnIndex(ConversationSchema.ConversationTable.Cols.UPLOADED));
         boolean uploaded = getInt(getColumnIndex(ConversationSchema.ConversationTable.Cols.UPLOADED)) == 1;
         String startTime = getString(getColumnIndex(ConversationSchema.ConversationTable.Cols.START_TIME));
 
