@@ -19,8 +19,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Formatter;
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
@@ -28,7 +31,7 @@ public class ConversationListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
     private BottomNavigationView mNavMenu;
-    
+
     // This method opens the respective activity upon navigation button press.
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
         switch ((item.getItemId())) {
@@ -85,7 +88,8 @@ public class ConversationListFragment extends Fragment {
 
         public void bind(Conversation c) {
             mConversation = c;
-            mDateTextView.setText(mConversation.getDate().toString()); //TODO: Format date in a normal way
+            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            mDateTextView.setText(formatter.format(mConversation.getDate()));
 
             Path imagePath = mConversation.getImageFile(getContext());
             File image = imagePath.toFile();
