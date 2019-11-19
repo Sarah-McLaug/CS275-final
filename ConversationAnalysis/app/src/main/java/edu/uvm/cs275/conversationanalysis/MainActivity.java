@@ -119,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 recordPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                if(recordPermission){
+                    startRecording();
+                }
                 break;
         }
     }
