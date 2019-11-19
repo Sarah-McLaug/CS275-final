@@ -29,6 +29,7 @@ public class DetailView extends AppCompatActivity {
 
     private BottomNavigationView mNavMenu;
     private PhotoView mImage;
+    private TextView mTimeInterval;
     private TextView mUUID;
 
     private Conversation mConversation;
@@ -50,6 +51,9 @@ public class DetailView extends AppCompatActivity {
 
         mImage = findViewById(R.id.photo_view);
         mUUID = findViewById(R.id.uuid);
+
+        mTimeInterval = findViewById(R.id.time_interval);
+        mTimeInterval.setText(mConversation.getInterval());
 
         mNavMenu = findViewById(R.id.bottom_navigation);
         mNavMenu.setOnNavigationItemSelectedListener(navListener);
