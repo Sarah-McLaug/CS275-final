@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -39,6 +38,7 @@ public class ConversationManager {
     private static final String PREFS_NAME = "CONVERSATION_PREFS";
     private static final String DEVICE_UUID = "DEVICE_UUID";
     private static final String DEVICE_REGISTERED = "DEVICE_REGISTERED";
+    private static final String ERROR_ALREADY_UPLOADED = "[\"conversation with this uuid already exists.\"]";
 
     private static ConversationManager sInstance;
     private Context mContext;
@@ -76,7 +76,7 @@ public class ConversationManager {
         ContentValues values = new ContentValues();
         values.put(ConversationTable.Cols.UUID, c.getUUID().toString());
         values.put(ConversationTable.Cols.DATE, c.getDate().getTime());
-        values.put(ConversationTable.Cols.UPLOADED, c.isUploaded());
+        values.put(ConversationTable.Cols.UPLOADED, c.isUploaded() ? 1 : 0);
         values.put(ConversationTable.Cols.START_TIME, c.getStartTime());
         return values;
     }
@@ -193,10 +193,10 @@ public class ConversationManager {
     }
 
     // returns true if conversation has been successfully uploaded, either now, or in the past
-    public boolean uploadConversation(final Conversation conversation) {
+    public void uploadConversation(final Conversation conversation, boolean async, UploadResultListener listener) {
         Log.i(TAG, "uploadConversation");
         if (conversation.isUploaded()) {
-            return true;
+            return;
         }
         if (!getDeviceRegistered()) {
             registerDevice();
@@ -214,7 +214,7 @@ public class ConversationManager {
         try {
             params.put("gammatone", gammatone);
         } catch (FileNotFoundException e) {
-            return false;
+            return;
         }
 
         // make request and handle response
@@ -224,56 +224,46 @@ public class ConversationManager {
                 conversation.setUploaded(true);
                 updateConversation(conversation);
                 Log.i(TAG, "Successfully uploaded conversation w/ status code" + statusCode);
+                if (listener != null) {
+                    listener.onFinished(true);
+                }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "Failed to upload conversation, got status " + statusCode + "; errors:");
-                for (Iterator<String> it = errorResponse.keys(); it.hasNext(); ) {
-                    String key = it.next();
-                    try {
-                        Log.e(TAG, key + ": " + errorResponse.getString(key));
-                    } catch (JSONException e) {
+                try {
+                    if (errorResponse != null && errorResponse.has("uuid") && errorResponse.getString("uuid").equals(ERROR_ALREADY_UPLOADED)) {
+                        Log.i(TAG, "Conversation already uploaded, marking locally.");
+                        conversation.setUploaded(true);
+                        updateConversation(conversation);
+                        if (listener != null) {
+                            listener.onFinished(true);
+                        }
+                        return;
                     }
+                } catch (JSONException e) {
+                    Log.i(TAG, "Failed to check error response for already-uploaded conversation.");
+                }
+                Log.e(TAG, "Failed to upload conversation, got status " + statusCode + "; errors:");
+                if (errorResponse != null) {
+                    for (Iterator<String> it = errorResponse.keys(); it.hasNext(); ) {
+                        String key = it.next();
+                        try {
+                            Log.e(TAG, key + ": " + errorResponse.getString(key));
+                        } catch (JSONException e) {
+                        }
+                    }
+                }
+                if (listener != null) {
+                    listener.onFinished(false);
                 }
             }
 
-        });
-
-        return conversation.isUploaded();
+        }, async);
     }
 
-
-    public static class UploadTask extends AsyncTask<Conversation, Void, Boolean> {
-
-
-        private final TaskListener mTaskListener;
-        private ConversationManager mConversationManager;
-
-        public UploadTask(Context context, TaskListener listener) {
-            mConversationManager = getInstance(context);
-            this.mTaskListener = listener;
-        }
-
-        @Override
-        protected Boolean doInBackground(Conversation... conversations) {
-            if (conversations.length != 1) {
-                return false;
-            }
-            return mConversationManager.uploadConversation(conversations[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            if (this.mTaskListener != null) {
-                this.mTaskListener.onFinished(result);
-            }
-        }
-
-        public interface TaskListener {
-            void onFinished(Boolean result);
-        }
+    public interface UploadResultListener {
+        void onFinished(boolean result);
     }
-
+    
 }

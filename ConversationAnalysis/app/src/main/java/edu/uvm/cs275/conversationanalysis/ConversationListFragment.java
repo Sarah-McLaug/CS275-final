@@ -19,6 +19,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Formatter;
 import java.util.List;
 
 public class ConversationListFragment extends Fragment {
@@ -26,15 +31,27 @@ public class ConversationListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
     private BottomNavigationView mNavMenu;
-    private ImageButton mRecordButton;
-    private ImageButton mStopButton;
+
+    // This method opens the respective activity upon navigation button press.
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
+        switch ((item.getItemId())) {
+            case R.id.nav_record:
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.nav_view:
+                // do nothing because we're already on that activity.
+                break;
+        }
+        return true;
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.conversation_list, container, false);
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        mRecyclerView = v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mNavMenu = v.findViewById(R.id.bottom_navigation);
@@ -48,13 +65,15 @@ public class ConversationListFragment extends Fragment {
     private void updateUI() {
         ConversationManager conversationLab = ConversationManager.getInstance(getActivity());
         List<Conversation> conversations = conversationLab.getConversations();
+        conversations.sort(Comparator.comparing(Conversation::getDate));
+        Collections.reverse(conversations);
 
         mAdapter = new ConversationAdapter(conversations);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     private class ConversationHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener{
+            implements View.OnClickListener {
         private Conversation mConversation;
         private TextView mDateTextView;
         private ImageView mImageView;
@@ -63,13 +82,14 @@ public class ConversationListFragment extends Fragment {
             super(inflater.inflate(R.layout.conversation_list_item, parent, false));
             itemView.setOnClickListener(this);
 
-            mDateTextView = (TextView) itemView.findViewById(R.id.conversation_date);
-            mImageView = (ImageView) itemView.findViewById(R.id.gammatone);
+            mDateTextView = itemView.findViewById(R.id.conversation_date);
+            mImageView = itemView.findViewById(R.id.gammatone);
         }
 
         public void bind(Conversation c) {
             mConversation = c;
-            mDateTextView.setText(mConversation.getDate().toString()); //TODO: Format date in a normal way
+            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            mDateTextView.setText(formatter.format(mConversation.getDate()));
 
             Path imagePath = mConversation.getImageFile(getContext());
             File image = imagePath.toFile();
@@ -79,7 +99,7 @@ public class ConversationListFragment extends Fragment {
         }
 
         @Override
-        public void onClick(View view){
+        public void onClick(View view) {
             Intent intent = DetailView.newIntent(getActivity(), mConversation);
             startActivity(intent);
         }
@@ -110,18 +130,4 @@ public class ConversationListFragment extends Fragment {
             return mConversations.size();
         }
     }
-
-    // This method opens the respective activity upon navigation button press.
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
-        switch ((item.getItemId())) {
-            case R.id.nav_record:
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.nav_view:
-                // do nothing because we're already on that activity.
-                break;
-        }
-        return true;
-    };
 }
