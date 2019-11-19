@@ -37,6 +37,7 @@ import edu.uvm.cs275.conversationanalysis.service.BackgroundUploadReceiver;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "Audio Recording";
+    private static final String ACTIVITY_INDEX = "ACTIVITY INDEX";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static final long RECORDING_DURATION = 30000;
     private static final int SAMPLE_RATE = 44100 * 2;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PROCESSING_RESULT = 1;
     public static final int RESULT_FAILURE = 2;
     private static final String RESULT_INTENT_UUID = "edu.uvm.cs275.conversationanalysis.conversation_uuid";
+    private static final String UUID_Index = "UUID_Index";
+    private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
 
     private BottomNavigationView mNavMenu;
     private ImageButton mRecordButton;
@@ -64,6 +67,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // open detail view if device was rotated
+        if(savedInstanceState != null){
+            int activityIndex = savedInstanceState.getInt(ACTIVITY_INDEX);
+            if(activityIndex == 2){
+                Intent detailIntent = new Intent(MainActivity.this, DetailView.class);
+                UUID savedUUID = UUID.fromString((String) savedInstanceState.getCharSequence(UUID_Index));
+                detailIntent.putExtra(GAMMATONE_UUID, savedUUID);
+                startActivity(detailIntent);
+            }
+        }
+
         mConversationManager = ConversationManager.getInstance(this);
         setContentView(R.layout.activity_main);
         scheduleAlarm();
