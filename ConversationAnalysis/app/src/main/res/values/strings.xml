@@ -17,4 +17,7 @@
     <string name="upload_success">Successfully uploaded conversation.</string>
     <string name="upload_failure">Upload failed. Try again later.</string>
     <string name="delete_button_caption">Delete</string>
+    <string name="delete_confirmation">Are you sure you want to delete this conversation?</string>
+    <string name="confirm">Yes</string>
+    <string name="deny">No</string>
 </resources>

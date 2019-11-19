@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -106,6 +107,9 @@ public class DetailView extends AppCompatActivity {
                             break;
                         case R.id.delete_button:
                             // delete the entry and open a new recycler view.
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            ConfirmationFragment confirmation = new ConfirmationFragment();
+                            confirmation.show(fragmentManager, "CONFIRMATION_FRAGMENT");
                             cm.deleteConversation(mConversation);
                             Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
                             startActivity(listIntentRefresh);
