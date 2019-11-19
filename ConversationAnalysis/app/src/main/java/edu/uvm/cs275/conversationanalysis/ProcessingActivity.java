@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -36,12 +37,15 @@ public class ProcessingActivity extends AppCompatActivity {
     private ImageView mGammatoneView;
     private Button mSendButton;
     private Button mCancelButton;
+    private TextView mTimeInterval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
         setupPython();
+
+        mConversation = new Conversation();
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
 
@@ -65,7 +69,8 @@ public class ProcessingActivity extends AppCompatActivity {
             finish();
         });
 
-        mConversation = new Conversation();
+        mTimeInterval = this.findViewById(R.id.time_interval);
+        mTimeInterval.setText(mConversation.getStartTime());
 
         mDuration = getIntent().getLongExtra(EXTRA_DURATION, 0);
 
