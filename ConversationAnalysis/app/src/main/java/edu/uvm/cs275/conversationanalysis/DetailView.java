@@ -24,6 +24,7 @@ public class DetailView extends AppCompatActivity {
 
     private static final String TAG = "DetailView";
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
+    private static final String ACTIVITY_INDEX = "ACTIVITY_INDEX";
     private static final String UUID_Index = "UUID_Index";
 
     private BottomNavigationView mNavMenu;
@@ -38,12 +39,8 @@ public class DetailView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_view);
 
-        UUID gammatoneID;
-        if (savedInstanceState == null) {
-            gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
-        } else {
-            gammatoneID = UUID.fromString((String) savedInstanceState.getCharSequence(UUID_Index));
-        }
+        UUID gammatoneID = (UUID) getIntent().getSerializableExtra(GAMMATONE_UUID);
+
         String UUID_string = "ID: " + gammatoneID;
 
         cm = ConversationManager.getInstance(getApplicationContext());
@@ -75,8 +72,10 @@ public class DetailView extends AppCompatActivity {
     }
 
     public static Intent newIntent(Context context, Conversation conversation) {
+        int detailViewIndex = 2;
         Intent intent = new Intent(context, DetailView.class);
         intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
+        intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
         return intent;
     }
 
