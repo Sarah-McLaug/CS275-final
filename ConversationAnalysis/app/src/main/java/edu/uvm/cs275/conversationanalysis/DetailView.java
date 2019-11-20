@@ -54,7 +54,7 @@ public class DetailView extends AppCompatActivity {
         mUUID = findViewById(R.id.uuid);
 
         mTimeInterval = findViewById(R.id.time_interval);
-        mTimeInterval.setText(mConversation.getInterval());
+        mTimeInterval.setText(mConversation.getStartTime());
 
         mNavMenu = findViewById(R.id.bottom_navigation);
         mNavMenu.setOnNavigationItemSelectedListener(navListener);
@@ -83,7 +83,6 @@ public class DetailView extends AppCompatActivity {
         intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
         return intent;
     }
-
 
     // This method handles what happens when the screen rotates
     @Override

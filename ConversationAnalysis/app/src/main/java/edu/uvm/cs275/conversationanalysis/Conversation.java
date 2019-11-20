@@ -12,7 +12,6 @@ public class Conversation {
     private Date mDate;
     private boolean mUploaded;
     private String mStartTime;
-    private String mEndTime;
 
     public Conversation(UUID uuid, Date date, boolean uploaded, String startTime) {
         this.mUUID = uuid;
@@ -59,17 +58,5 @@ public class Conversation {
 
     public void setStartTime(String startTime) {
         mStartTime = startTime;
-    }
-
-    public String getEndTime() {
-        return mEndTime;
-    }
-
-    public void setEndTime(String endTime) {
-        mEndTime = endTime;
-    }
-
-    public String getInterval() {
-        return getStartTime() + " - " + getEndTime();
     }
 }
