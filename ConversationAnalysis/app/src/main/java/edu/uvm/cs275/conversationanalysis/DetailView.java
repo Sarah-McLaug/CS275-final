@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,39 @@ public class DetailView extends AppCompatActivity {
 
     private Conversation mConversation;
     private ConversationManager cm;
+    private ImageButton mUploadButton;
+    
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch ((item.getItemId())) {
+                        case R.id.nav_record:
+                            Intent mainIntent = new Intent(DetailView.this, MainActivity.class);
+                            startActivity(mainIntent);
+                            break;
+                        case R.id.nav_view:
+                            Intent listIntent = new Intent(DetailView.this, ConversationListActivity.class);
+                            startActivity(listIntent);
+                            break;
+                        case R.id.delete_button:
+                            // delete the entry and open a new recycler view.
+                            cm.deleteConversation(mConversation);
+                            Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
+                            startActivity(listIntentRefresh);
+                            break;
+                    }
+                    return true;
+                }
+            };
+
+    public static Intent newIntent(Context context, Conversation conversation) {
+        int detailViewIndex = 2;
+        Intent intent = new Intent(context, DetailView.class);
+        intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
+        intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,28 +91,34 @@ public class DetailView extends AppCompatActivity {
         mUUID.setText(UUID_string);
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
-        if (!mConversation.isUploaded()) {
-            Log.d(TAG, "Uploading conversation...");
-            cm.uploadConversation(mConversation, true, result -> {
-                if (result) {
-                    Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
-                } else {
-                    Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
-                }
-            });
+
+        mUploadButton = findViewById(R.id.upload_button);
+        mUploadButton.setOnClickListener(view -> {
+            upload(cm);
+        });
+
+        if (mConversation.isUploaded()) {
+            mUploadButton.setImageResource(R.drawable.ic_uploaded);
+            mUploadButton.setEnabled(false);
+        } else {
+            upload(cm);
         }
     }
 
-    public static Intent newIntent(Context context, Conversation conversation) {
-        int detailViewIndex = 2;
-        Intent intent = new Intent(context, DetailView.class);
-        intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
-        intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
-        return intent;
+    private void upload(ConversationManager cm) {
+        Log.d(TAG, "Uploading conversation...");
+        cm.uploadConversation(mConversation, true, result -> {
+            if (result) {
+                Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
+                Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
+                mUploadButton.setImageResource(R.drawable.ic_uploaded);
+                mUploadButton.setEnabled(false);
+            } else {
+                Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
+                Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
+            }
+        });
     }
-
 
     // This method handles what happens when the screen rotates
     @Override
@@ -86,28 +126,4 @@ public class DetailView extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(UUID_Index, mUUID.toString());
     }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch ((item.getItemId())) {
-                        case R.id.nav_record:
-                            Intent mainIntent = new Intent(DetailView.this, MainActivity.class);
-                            startActivity(mainIntent);
-                            break;
-                        case R.id.nav_view:
-                            Intent listIntent = new Intent(DetailView.this, ConversationListActivity.class);
-                            startActivity(listIntent);
-                            break;
-                        case R.id.delete_button:
-                            // delete the entry and open a new recycler view.
-                            cm.deleteConversation(mConversation);
-                            Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
-                            startActivity(listIntentRefresh);
-                            break;
-                    }
-                    return true;
-                }
-            };
 }
