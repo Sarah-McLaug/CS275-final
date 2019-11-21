@@ -20,7 +20,9 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
+import java.nio.channels.NonWritableChannelException;
 import java.nio.file.Path;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -133,8 +135,8 @@ public class ProcessingActivity extends AppCompatActivity {
         File audioInputFile = getRawAudioFile(getApplicationContext());
 
         // start time is random between 0 and max time where length is still correct
-        long start = ThreadLocalRandom.current().nextLong(mDuration - ConversationManager.CONVERSATION_LENGTH);
-        Log.i(TAG, Long.toString(start));
+        Random random = new Random(System.currentTimeMillis());
+        long start = random.nextLong() % (mDuration - ConversationManager.CONVERSATION_LENGTH);
 
         // convert to wav and trim audio
         String cmd = String.format(
