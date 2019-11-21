@@ -69,9 +69,6 @@ public class ProcessingActivity extends AppCompatActivity {
             finish();
         });
 
-        mTimeInterval = this.findViewById(R.id.time_interval);
-        mTimeInterval.setText(mConversation.getStartTime());
-
         mDuration = getIntent().getLongExtra(EXTRA_DURATION, 0);
 
         new ProcessAudioTask(this).execute();
@@ -143,7 +140,7 @@ public class ProcessingActivity extends AppCompatActivity {
                 audioInputFile.toString(),
                 getAudioFile(getApplicationContext()).toString()
         );
-        mConversation.setStartTime(formatDuration(start));
+        mConversation.setStartTime(formatDuration(start) + " - " + formatDuration(start + 15000));
 
         Log.d(TAG, "running: " + cmd);
         FFmpeg.execute(cmd);
@@ -161,6 +158,8 @@ public class ProcessingActivity extends AppCompatActivity {
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
 
+        mTimeInterval = this.findViewById(R.id.time_interval);
+        mTimeInterval.setText(mConversation.getStartTime());
 
         if (!inFile.exists()) {
             Log.d("inFile", "The inFile does not exist");

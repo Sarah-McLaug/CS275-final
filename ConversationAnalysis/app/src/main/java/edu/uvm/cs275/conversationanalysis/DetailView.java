@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,12 +31,13 @@ public class DetailView extends AppCompatActivity {
 
     private BottomNavigationView mNavMenu;
     private PhotoView mImage;
+    private TextView mTimeInterval;
     private TextView mUUID;
 
     private Conversation mConversation;
     private ConversationManager cm;
     private ImageButton mUploadButton;
-    
+
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -51,6 +53,9 @@ public class DetailView extends AppCompatActivity {
                             break;
                         case R.id.delete_button:
                             // delete the entry and open a new recycler view.
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            ConfirmationFragment confirmation = new ConfirmationFragment();
+                            confirmation.show(fragmentManager, "CONFIRMATION_FRAGMENT");
                             cm.deleteConversation(mConversation);
                             Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
                             startActivity(listIntentRefresh);
@@ -84,6 +89,9 @@ public class DetailView extends AppCompatActivity {
 
         mImage = findViewById(R.id.photo_view);
         mUUID = findViewById(R.id.uuid);
+
+        mTimeInterval = findViewById(R.id.time_interval);
+        mTimeInterval.setText(mConversation.getStartTime());
 
         mNavMenu = findViewById(R.id.bottom_navigation);
         mNavMenu.setOnNavigationItemSelectedListener(navListener);
