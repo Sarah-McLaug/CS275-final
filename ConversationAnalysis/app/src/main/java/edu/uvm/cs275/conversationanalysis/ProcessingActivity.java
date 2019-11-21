@@ -20,7 +20,9 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
+import java.nio.channels.NonWritableChannelException;
 import java.nio.file.Path;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +50,7 @@ public class ProcessingActivity extends AppCompatActivity {
         mConversation = new Conversation();
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
+        mTimeInterval = this.findViewById(R.id.time_interval);
 
         mSendButton = this.findViewById(R.id.send_data);
         mSendButton.setOnClickListener((View v) -> {
@@ -68,9 +71,6 @@ public class ProcessingActivity extends AppCompatActivity {
             setResult(MainActivity.RESULT_CANCELED, returnIntent);
             finish();
         });
-
-        mTimeInterval = this.findViewById(R.id.time_interval);
-        mTimeInterval.setText(mConversation.getStartTime());
 
         mDuration = getIntent().getLongExtra(EXTRA_DURATION, 0);
 
@@ -112,6 +112,8 @@ public class ProcessingActivity extends AppCompatActivity {
                 return;
             }
 
+            mTimeInterval.setText(mConversation.getStartTime());
+
             final File imageFile = c.getImageFile(getApplicationContext()).toFile();
             if (imageFile == null) {
                 mGammatoneView.setImageDrawable(null);
@@ -133,7 +135,8 @@ public class ProcessingActivity extends AppCompatActivity {
         File audioInputFile = getRawAudioFile(getApplicationContext());
 
         // start time is random between 0 and max time where length is still correct
-        long start = ThreadLocalRandom.current().nextLong(mDuration - ConversationManager.CONVERSATION_LENGTH);
+        Random random = new Random(System.currentTimeMillis());
+        long start = random.nextLong() % (mDuration - ConversationManager.CONVERSATION_LENGTH);
 
         // convert to wav and trim audio
         String cmd = String.format(
@@ -143,7 +146,7 @@ public class ProcessingActivity extends AppCompatActivity {
                 audioInputFile.toString(),
                 getAudioFile(getApplicationContext()).toString()
         );
-        mConversation.setStartTime(formatDuration(start));
+        mConversation.setStartTime(formatDuration(start) + " - " + formatDuration(start + 15000));
 
         Log.d(TAG, "running: " + cmd);
         FFmpeg.execute(cmd);
@@ -160,7 +163,6 @@ public class ProcessingActivity extends AppCompatActivity {
         File inFile = getAudioFile(getApplicationContext());
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
-
 
         if (!inFile.exists()) {
             Log.d("inFile", "The inFile does not exist");

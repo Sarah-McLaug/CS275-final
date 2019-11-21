@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +33,20 @@ public class DetailView extends AppCompatActivity {
 
     private BottomNavigationView mNavMenu;
     private PhotoView mImage;
+    private TextView mTimeInterval;
     private TextView mUUID;
 
     private Conversation mConversation;
     private ConversationManager cm;
+    private ImageButton mUploadButton;
+
+    public static Intent newIntent(Context context, Conversation conversation) {
+        int detailViewIndex = 2;
+        Intent intent = new Intent(context, DetailView.class);
+        intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
+        intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,34 +65,43 @@ public class DetailView extends AppCompatActivity {
         mImage = findViewById(R.id.photo_view);
         mUUID = findViewById(R.id.uuid);
 
+        mTimeInterval = findViewById(R.id.time_interval);
+        mTimeInterval.setText(mConversation.getStartTime());
+
         mNavMenu = findViewById(R.id.bottom_navigation);
         mNavMenu.setOnNavigationItemSelectedListener(navListener);
 
         mUUID.setText(UUID_string);
         Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
         mImage.setImageBitmap(bmp);
-        if (!mConversation.isUploaded()) {
-            Log.d(TAG, "Uploading conversation...");
-            cm.uploadConversation(mConversation, true, result -> {
-                if (result) {
-                    Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
-                } else {
-                    Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
-                    Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
-                }
-            });
+
+        mUploadButton = findViewById(R.id.upload_button);
+        mUploadButton.setOnClickListener(view -> {
+            upload(cm);
+        });
+
+        if (mConversation.isUploaded()) {
+            mUploadButton.setImageResource(R.drawable.ic_uploaded);
+            mUploadButton.setEnabled(false);
+        } else {
+            upload(cm);
         }
     }
 
-    public static Intent newIntent(Context context, Conversation conversation) {
-        int detailViewIndex = 2;
-        Intent intent = new Intent(context, DetailView.class);
-        intent.putExtra(GAMMATONE_UUID, conversation.getUUID());
-        intent.putExtra(ACTIVITY_INDEX, detailViewIndex);
-        return intent;
+    private void upload(ConversationManager cm) {
+        Log.d(TAG, "Uploading conversation...");
+        cm.uploadConversation(mConversation, true, result -> {
+            if (result) {
+                Log.d(TAG, "Successfully uploaded conversation " + mConversation.getUUID().toString());
+                Toast.makeText(DetailView.this, R.string.upload_success, Toast.LENGTH_LONG).show();
+                mUploadButton.setImageResource(R.drawable.ic_uploaded);
+                mUploadButton.setEnabled(false);
+            } else {
+                Log.i(TAG, "Could not upload conversation " + mConversation.getUUID().toString());
+                Toast.makeText(DetailView.this, R.string.upload_failure, Toast.LENGTH_LONG).show();
+            }
+        });
     }
-
 
     // This method handles what happens when the screen rotates
     @Override
