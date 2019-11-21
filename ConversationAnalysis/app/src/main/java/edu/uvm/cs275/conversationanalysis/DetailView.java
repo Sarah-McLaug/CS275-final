@@ -1,5 +1,6 @@
 package edu.uvm.cs275.conversationanalysis;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,6 +28,7 @@ public class DetailView extends AppCompatActivity {
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
     private static final String ACTIVITY_INDEX = "ACTIVITY_INDEX";
     private static final String UUID_Index = "UUID_Index";
+    private static final int REQUEST_CONFIRM_DELETE = 3;
 
     private BottomNavigationView mNavMenu;
     private PhotoView mImage;
@@ -104,14 +106,29 @@ public class DetailView extends AppCompatActivity {
                         case R.id.delete_button:
                             // delete the entry and open a new recycler view.
                             FragmentManager fragmentManager = getSupportFragmentManager();
-                            ConfirmationFragment confirmation = new ConfirmationFragment();
-                            confirmation.show(fragmentManager, "CONFIRMATION_FRAGMENT");
-                            cm.deleteConversation(mConversation);
-                            Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
-                            startActivity(listIntentRefresh);
+                            ConfirmationFragment alertdialog = new ConfirmationFragment();
+                            alertdialog.show(fragmentManager, "CONFIRMATION_FRAGMENT");
+                            //cm.deleteConversation(mConversation);
+                            //Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
+                            //startActivity(listIntentRefresh);
                             break;
                     }
                     return true;
                 }
             };
+
+    // this function handles the callback from the delete alert dialog
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        } else {
+
+        //if (requestCode == REQUEST_CONFIRM_DELETE) {
+            cm.deleteConversation(mConversation);
+            Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
+            startActivity(listIntentRefresh);
+        }
+    }
 }
