@@ -48,6 +48,7 @@ public class ProcessingActivity extends AppCompatActivity {
         mConversation = new Conversation();
 
         mGammatoneView = this.findViewById(R.id.image_gammatone);
+        mTimeInterval = this.findViewById(R.id.time_interval);
 
         mSendButton = this.findViewById(R.id.send_data);
         mSendButton.setOnClickListener((View v) -> {
@@ -109,6 +110,8 @@ public class ProcessingActivity extends AppCompatActivity {
                 return;
             }
 
+            mTimeInterval.setText(mConversation.getStartTime());
+
             final File imageFile = c.getImageFile(getApplicationContext()).toFile();
             if (imageFile == null) {
                 mGammatoneView.setImageDrawable(null);
@@ -131,6 +134,7 @@ public class ProcessingActivity extends AppCompatActivity {
 
         // start time is random between 0 and max time where length is still correct
         long start = ThreadLocalRandom.current().nextLong(mDuration - ConversationManager.CONVERSATION_LENGTH);
+        Log.i(TAG, Long.toString(start));
 
         // convert to wav and trim audio
         String cmd = String.format(
@@ -157,9 +161,6 @@ public class ProcessingActivity extends AppCompatActivity {
         File inFile = getAudioFile(getApplicationContext());
         Path imageDir = ConversationManager.getInstance(getApplicationContext()).getImageDir();
         File outFile = mConversation.getImageFile(getApplicationContext()).toFile();
-
-        mTimeInterval = this.findViewById(R.id.time_interval);
-        mTimeInterval.setText(mConversation.getStartTime());
 
         if (!inFile.exists()) {
             Log.d("inFile", "The inFile does not exist");
