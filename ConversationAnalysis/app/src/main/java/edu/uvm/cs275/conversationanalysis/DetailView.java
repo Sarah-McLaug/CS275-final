@@ -135,6 +135,7 @@ public class DetailView extends AppCompatActivity implements ConfirmationFragmen
             };
 
     // this function handles the callback from the delete alert dialog
+    // ask Hibbeler for details
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -149,6 +150,8 @@ public class DetailView extends AppCompatActivity implements ConfirmationFragmen
         }
     }
 
+    // this function handles the callback from the delete alert dialog
+    // ask Hibbeler for details
     @Override
     public void sendResultCode(boolean deleteConfirmation) {
         Intent intent = new Intent(DetailView.this, ConversationListActivity.class);
