@@ -23,7 +23,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.UUID;
 
-public class DetailView extends AppCompatActivity {
+public class DetailView extends AppCompatActivity implements ConfirmationFragment.InterfaceCommunicator {
 
     private static final String TAG = "DetailView";
     private static final String GAMMATONE_UUID = "GAMMATONE_UUID";
@@ -128,9 +128,6 @@ public class DetailView extends AppCompatActivity {
                             FragmentManager fragmentManager = getSupportFragmentManager();
                             ConfirmationFragment alertdialog = new ConfirmationFragment();
                             alertdialog.show(fragmentManager, "CONFIRMATION_FRAGMENT");
-                            //cm.deleteConversation(mConversation);
-                            //Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
-                            //startActivity(listIntentRefresh);
                             break;
                     }
                     return true;
@@ -150,5 +147,14 @@ public class DetailView extends AppCompatActivity {
             Intent listIntentRefresh = new Intent(DetailView.this, ConversationListActivity.class);
             startActivity(listIntentRefresh);
         }
+    }
+
+    @Override
+    public void sendResultCode(boolean deleteConfirmation) {
+        Intent intent = new Intent(DetailView.this, ConversationListActivity.class);
+        if(deleteConfirmation == true){
+            cm.deleteConversation(mConversation);
+        }
+        startActivity(intent);
     }
 }

@@ -11,8 +11,16 @@ import androidx.fragment.app.DialogFragment;
 
 public class ConfirmationFragment extends DialogFragment {
     public static final String EXTRA_BOOL = "edu.uvm.cs275.bool";
+
+    public InterfaceCommunicator mInterfaceCommunicator;
+
+    public interface InterfaceCommunicator {
+        public void sendResultCode(boolean flag);
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mInterfaceCommunicator = (InterfaceCommunicator) getContext();
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.delete_confirmation)
                 .setPositiveButton(R.string.confirm, yesPressed)
@@ -23,19 +31,13 @@ public class ConfirmationFragment extends DialogFragment {
     private DialogInterface.OnClickListener yesPressed = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            sendResult(Activity.RESULT_OK, true);
+            mInterfaceCommunicator.sendResultCode(true);
         }
     };
 
-    private void sendResult(int resultCode, Boolean bool) {
-        //if (getTargetFragment() == null) {
-        //    return;
-        //}
-
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_BOOL, true);
-
-        onActivityResult(getTargetRequestCode(), resultCode, intent);
-        //getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mInterfaceCommunicator = null;
     }
 }
